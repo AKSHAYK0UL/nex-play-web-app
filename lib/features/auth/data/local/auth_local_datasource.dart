@@ -3,7 +3,7 @@ import 'package:nex_play/core/constants/hive_const.dart';
 import 'package:nex_play/core/errors/exceptions.dart';
 import 'package:nex_play/core/utils/logger.dart';
 
-abstract class AuthLocalDatasource {
+abstract interface class AuthLocalDatasource {
   Future<void> saveToken(String token);
   Future<String?> getToken();
   Future<void> deleteToken();
