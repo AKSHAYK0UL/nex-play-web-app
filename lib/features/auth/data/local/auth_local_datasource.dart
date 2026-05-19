@@ -2,12 +2,13 @@ import 'package:hive/hive.dart';
 import 'package:nex_play/core/constants/hive_const.dart';
 import 'package:nex_play/core/errors/exceptions.dart';
 import 'package:nex_play/core/utils/logger.dart';
+import 'package:nex_play/features/auth/domain/entities/auth_tokens.dart';
 
 abstract interface class AuthLocalDatasource {
-  Future<void> saveToken(String token);
-  Future<String?> getToken();
-  Future<void> deleteToken();
-  Future<bool> hasToken();
+  Future<void> saveTokens(String token, String refreshToken);
+  Future<AuthTokens?> getTokens();
+  Future<void> deleteTokens();
+  Future<bool> hasTokens();
 }
 
 class AuthLocalDatasourceImpl implements AuthLocalDatasource {
@@ -15,9 +16,10 @@ class AuthLocalDatasourceImpl implements AuthLocalDatasource {
 
   AuthLocalDatasourceImpl(this._authBox);
   @override
-  Future<void> saveToken(String token) async {
+  Future<void> saveTokens(String token, String refreshToken) async {
     try {
       await _authBox.put(HiveConst.tokenKey, token);
+      await _authBox.put(HiveConst.refreshTokenKey, refreshToken);
       AppLogger.info('Auth token saved to local storage.');
     } catch (e) {
       AppLogger.error('Failed to save token', error: e);
@@ -26,13 +28,14 @@ class AuthLocalDatasourceImpl implements AuthLocalDatasource {
   }
 
   @override
-  Future<String?> getToken() async {
+  Future<AuthTokens?> getTokens() async {
     try {
       final token = _authBox.get(HiveConst.tokenKey);
-      AppLogger.debug(
-        'Token retrieved from storage: ${token != null ? "EXISTS" : "NULL"}',
-      );
-      return token;
+      final refreshToken = _authBox.get(HiveConst.refreshTokenKey);
+      if (token != null && refreshToken != null) {
+        return AuthTokens(token: token, refreshToken: refreshToken);
+      }
+      return null;
     } catch (e) {
       AppLogger.error('Failed to get token', error: e);
       throw const CacheException('Failed to retrieve auth token.');
@@ -40,9 +43,10 @@ class AuthLocalDatasourceImpl implements AuthLocalDatasource {
   }
 
   @override
-  Future<void> deleteToken() async {
+  Future<void> deleteTokens() async {
     try {
       await _authBox.delete(HiveConst.tokenKey);
+      await _authBox.delete(HiveConst.refreshTokenKey);
       AppLogger.info('Auth token cleared from local storage.');
     } catch (e) {
       AppLogger.error('Failed to clear token', error: e);
@@ -51,8 +55,8 @@ class AuthLocalDatasourceImpl implements AuthLocalDatasource {
   }
 
   @override
-  Future<bool> hasToken() async {
-    final token = await getToken();
-    return token != null && token.isNotEmpty;
+  Future<bool> hasTokens() async {
+    final tokens = await getTokens();
+    return tokens != null;
   }
 }

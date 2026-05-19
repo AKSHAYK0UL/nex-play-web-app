@@ -1,28 +1,28 @@
-abstract class Failures {
+abstract class Failure {
   final String message;
-  Failures(this.message);
+  Failure(this.message);
 }
 
-class ServerFailures extends Failures {
-  ServerFailures([super.message = 'Server failure.']);
+class ServerFailure extends Failure {
+  ServerFailure([super.message = 'Server failure.']);
 }
 
-class NetworkFailures extends Failures {
-  NetworkFailures([super.message = 'Network failure.']);
+class NetworkFailure extends Failure {
+  NetworkFailure([super.message = 'Network failure.']);
 }
 
-class CacheFailures extends Failures {
-  CacheFailures([super.message = 'Cache failure.']);
+class CacheFailure extends Failure {
+  CacheFailure([super.message = 'Cache failure.']);
 }
 
-class AuthFailures extends Failures {
-  AuthFailures([super.message = 'Authentication failure.']);
+class AuthFailure extends Failure {
+  AuthFailure([super.message = 'Authentication failure.']);
 }
 
-class ParseFailures extends Failures {
-  ParseFailures([super.message = 'Failed to parse server response.']);
+class ParseFailure extends Failure {
+  ParseFailure([super.message = 'Failed to parse server response.']);
 }
 
-class ValidationFailures extends Failures {
-  ValidationFailures([super.message = 'Validation failure.']);
+class ValidationFailure extends Failure {
+  ValidationFailure([super.message = 'Validation failure.']);
 }
