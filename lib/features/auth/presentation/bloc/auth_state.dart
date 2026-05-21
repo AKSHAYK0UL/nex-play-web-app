@@ -7,7 +7,7 @@ part 'auth_state.freezed.dart';
 abstract class AuthState with _$AuthState {
   const factory AuthState.initial() = _AuthInitial;
   const factory AuthState.loading() = _AuthLoading;
-  const factory AuthState.verify() = _AuthVerify;
+  const factory AuthState.verify({required String email}) = _AuthVerify;
   const factory AuthState.success({required AuthTokens tokens}) = _AuthSuccess;
   const factory AuthState.error({required String error}) = _AuthError;
 }

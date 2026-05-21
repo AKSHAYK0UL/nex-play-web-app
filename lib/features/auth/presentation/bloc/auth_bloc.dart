@@ -33,7 +33,50 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     String email,
     String password,
     Emitter<AuthState> emit,
-  ) async {}
-  _verifyEvent(String email, String otp, Emitter<AuthState> emit) async {}
-  _signInEvent(String email, String password, Emitter<AuthState> emit) async {}
+  ) async {
+    emit(const AuthState.loading());
+    final result = await _signUpUseCase(
+      SignInParams(name: name, email: email, password: password),
+    );
+    result.fold(
+      (failure) {
+        emit(AuthState.error(error: failure.message));
+      },
+      (success) {
+        emit(AuthState.verify(email: email));
+      },
+    );
+  }
+
+  _verifyEvent(String email, String otp, Emitter<AuthState> emit) async {
+    emit(const AuthState.loading());
+
+    final result = await _verifyOtpUseCase(
+      VerifyParams(email: email, otp: otp),
+    );
+    result.fold(
+      (failure) {
+        emit(AuthState.error(error: failure.message));
+      },
+      (success) {
+        emit(AuthState.success(tokens: success));
+      },
+    );
+  }
+
+  _signInEvent(String email, String password, Emitter<AuthState> emit) async {
+    emit(const AuthState.loading());
+
+    final result = await _signInUseCase(
+      VerifyParams(email: email, otp: password),
+    );
+    result.fold(
+      (failure) {
+        emit(AuthState.error(error: failure.message));
+      },
+      (success) {
+        emit(AuthState.success(tokens: success));
+      },
+    );
+  }
 }
