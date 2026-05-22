@@ -1,28 +1,27 @@
+
+
 import 'package:flutter/material.dart';
-
-
-
-
-
-
-
-import 'package:go_router/go_router.dart';
-import 'package:nex_play/core/router/app_router.dart';
 import 'package:nex_play/core/theme/app_theme.dart';
 
-class ContinueButton extends StatefulWidget {
-  
+class AuthButton extends StatefulWidget {
+  final String label;
+  final VoidCallback? onTap;
+  final bool loading;
+  final bool secondary;
 
-  const ContinueButton({
+  const AuthButton({
     super.key,
-  
+    required this.label,
+    this.onTap,
+    this.loading = false,
+    this.secondary = false,
   });
 
   @override
-  State<ContinueButton> createState() => _ContinueButtonState();
+  State<AuthButton> createState() => _AuthButtonState();
 }
 
-class _ContinueButtonState extends State<ContinueButton>
+class _AuthButtonState extends State<AuthButton>
     with SingleTickerProviderStateMixin {
   late AnimationController _scaleCtrl;
   late Animation<double> _scaleAnim;
@@ -49,7 +48,12 @@ class _ContinueButtonState extends State<ContinueButton>
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: ()=>context.push(RoutePath.authScreen),
+      onTapDown: (_) => _scaleCtrl.forward(),
+      onTapUp: (_) {
+        _scaleCtrl.reverse();
+        if (!widget.loading) widget.onTap?.call();
+      },
+      onTapCancel: () => _scaleCtrl.reverse(),
       child: ScaleTransition(
         scale: _scaleAnim,
         child: AnimatedContainer(
@@ -57,7 +61,9 @@ class _ContinueButtonState extends State<ContinueButton>
           width: double.infinity,
           height: 56,
           decoration: BoxDecoration(
-            gradient:  const LinearGradient(
+            gradient: widget.secondary
+                ? null
+                : const LinearGradient(
                     colors: [
                       AppTheme.redBright,
                       AppTheme.red,
@@ -65,14 +71,14 @@ class _ContinueButtonState extends State<ContinueButton>
                     ],
                     stops: [0.0, 0.5, 1.0],
                   ),
-            color:  AppTheme.surfaceAlt ,
+            color: widget.secondary ? AppTheme.surfaceAlt : null,
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-            border: 
-                Border.all(color: AppTheme.divider),
-              
-            boxShadow: 
-                
-                 [
+            border: widget.secondary
+                ? Border.all(color: AppTheme.divider)
+                : null,
+            boxShadow: widget.secondary
+                ? []
+                : [
                     BoxShadow(
                       color: AppTheme.red.withValues(alpha:0.35),
                       blurRadius: 18,
@@ -81,11 +87,21 @@ class _ContinueButtonState extends State<ContinueButton>
                   ],
           ),
           child: Center(
-            child:Text(
-                    "Continue",
+            child: widget.loading
+                ? const SizedBox(
+                    width: 22,
+                    height: 22,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                : Text(
+                    widget.label,
                     style: TextStyle(
-                      color: 
-                           Colors.white,
+                      color: widget.secondary
+                          ? AppTheme.text
+                          : Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.3,
