@@ -131,13 +131,13 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( String email)?  verify,TResult Function( AuthTokens tokens)?  success,TResult Function( String error)?  error,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( String email)?  verify,TResult Function()?  success,TResult Function( String error)?  error,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AuthInitial() when initial != null:
 return initial();case _AuthLoading() when loading != null:
 return loading();case _AuthVerify() when verify != null:
 return verify(_that.email);case _AuthSuccess() when success != null:
-return success(_that.tokens);case _AuthError() when error != null:
+return success();case _AuthError() when error != null:
 return error(_that.error);case _:
   return orElse();
 
@@ -156,13 +156,13 @@ return error(_that.error);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( String email)  verify,required TResult Function( AuthTokens tokens)  success,required TResult Function( String error)  error,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( String email)  verify,required TResult Function()  success,required TResult Function( String error)  error,}) {final _that = this;
 switch (_that) {
 case _AuthInitial():
 return initial();case _AuthLoading():
 return loading();case _AuthVerify():
 return verify(_that.email);case _AuthSuccess():
-return success(_that.tokens);case _AuthError():
+return success();case _AuthError():
 return error(_that.error);case _:
   throw StateError('Unexpected subclass');
 
@@ -180,13 +180,13 @@ return error(_that.error);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( String email)?  verify,TResult? Function( AuthTokens tokens)?  success,TResult? Function( String error)?  error,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( String email)?  verify,TResult? Function()?  success,TResult? Function( String error)?  error,}) {final _that = this;
 switch (_that) {
 case _AuthInitial() when initial != null:
 return initial();case _AuthLoading() when loading != null:
 return loading();case _AuthVerify() when verify != null:
 return verify(_that.email);case _AuthSuccess() when success != null:
-return success(_that.tokens);case _AuthError() when error != null:
+return success();case _AuthError() when error != null:
 return error(_that.error);case _:
   return null;
 
@@ -329,67 +329,33 @@ as String,
 
 
 class _AuthSuccess implements AuthState {
-  const _AuthSuccess({required this.tokens});
+  const _AuthSuccess();
   
 
- final  AuthTokens tokens;
 
-/// Create a copy of AuthState
-/// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-_$AuthSuccessCopyWith<_AuthSuccess> get copyWith => __$AuthSuccessCopyWithImpl<_AuthSuccess>(this, _$identity);
+
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthSuccess&&(identical(other.tokens, tokens) || other.tokens == tokens));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthSuccess);
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,tokens);
+int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'AuthState.success(tokens: $tokens)';
+  return 'AuthState.success()';
 }
 
 
 }
 
-/// @nodoc
-abstract mixin class _$AuthSuccessCopyWith<$Res> implements $AuthStateCopyWith<$Res> {
-  factory _$AuthSuccessCopyWith(_AuthSuccess value, $Res Function(_AuthSuccess) _then) = __$AuthSuccessCopyWithImpl;
-@useResult
-$Res call({
- AuthTokens tokens
-});
 
 
-
-
-}
-/// @nodoc
-class __$AuthSuccessCopyWithImpl<$Res>
-    implements _$AuthSuccessCopyWith<$Res> {
-  __$AuthSuccessCopyWithImpl(this._self, this._then);
-
-  final _AuthSuccess _self;
-  final $Res Function(_AuthSuccess) _then;
-
-/// Create a copy of AuthState
-/// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? tokens = null,}) {
-  return _then(_AuthSuccess(
-tokens: null == tokens ? _self.tokens : tokens // ignore: cast_nullable_to_non_nullable
-as AuthTokens,
-  ));
-}
-
-
-}
 
 /// @nodoc
 

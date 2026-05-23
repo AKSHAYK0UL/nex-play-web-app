@@ -10,6 +10,8 @@ class CustomTextfeild extends StatefulWidget {
   final IconData? suffixIcon;
   final VoidCallback? onSuffixTap;
   final TextInputType keyboardType;
+  final TextInputAction textInputAction;
+
   final TextCapitalization textCapitalization;
   final String? Function(String?)? validator;
 
@@ -25,6 +27,7 @@ class CustomTextfeild extends StatefulWidget {
     this.keyboardType = TextInputType.text,
     this.textCapitalization = TextCapitalization.none,
     this.validator,
+    this.textInputAction = TextInputAction.done,
   });
 
   @override
@@ -59,14 +62,14 @@ class _CustomTextfeildState extends State<CustomTextfeild> {
         borderRadius: BorderRadius.circular(AppTheme.radiusMd),
         border: Border.all(
           color: _focused
-              ? AppTheme.red.withValues(alpha:0.7)
+              ? AppTheme.red.withValues(alpha: 0.7)
               : AppTheme.fieldBorder,
           width: _focused ? 1.5 : 1.0,
         ),
         boxShadow: _focused
             ? [
                 BoxShadow(
-                  color: AppTheme.red.withValues(alpha:0.08),
+                  color: AppTheme.red.withValues(alpha: 0.08),
                   blurRadius: 12,
                   spreadRadius: 0,
                 ),
@@ -80,6 +83,8 @@ class _CustomTextfeildState extends State<CustomTextfeild> {
         keyboardType: widget.keyboardType,
         textCapitalization: widget.textCapitalization,
         validator: widget.validator,
+        textInputAction: widget.textInputAction,
+
         style: const TextStyle(
           color: AppTheme.text,
           fontSize: 15,

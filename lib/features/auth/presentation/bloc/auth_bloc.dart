@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:nex_play/features/auth/domain/usecases/signin_usecase.dart';
 import 'package:nex_play/features/auth/domain/usecases/signup_usecase.dart';
 import 'package:nex_play/features/auth/domain/usecases/verify_usecase.dart';
 
@@ -8,12 +9,12 @@ import 'package:nex_play/features/auth/presentation/bloc/auth_state.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final SignupUsecase _signUpUseCase;
   final VerifyUsecase _verifyOtpUseCase;
-  final VerifyUsecase _signInUseCase;
+  final SigninUsecase _signInUseCase;
 
   AuthBloc({
     required SignupUsecase signUpUseCase,
     required VerifyUsecase verifyOtpUseCase,
-    required VerifyUsecase signInUseCase,
+    required SigninUsecase signInUseCase,
   }) : _signUpUseCase = signUpUseCase,
        _verifyOtpUseCase = verifyOtpUseCase,
        _signInUseCase = signInUseCase,
@@ -28,7 +29,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     });
   }
 
-  _signUpEvent(
+  Future<void> _signUpEvent(
     String name,
     String email,
     String password,
@@ -48,7 +49,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
   }
 
-  _verifyEvent(String email, String otp, Emitter<AuthState> emit) async {
+  Future<void> _verifyEvent(String email, String otp, Emitter<AuthState> emit) async {
     emit(const AuthState.loading());
 
     final result = await _verifyOtpUseCase(
@@ -59,23 +60,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(AuthState.error(error: failure.message));
       },
       (success) {
-        emit(AuthState.success(tokens: success));
+        emit(AuthState.success());
       },
     );
   }
 
-  _signInEvent(String email, String password, Emitter<AuthState> emit) async {
+  Future<void> _signInEvent(String email, String password, Emitter<AuthState> emit) async {
     emit(const AuthState.loading());
 
     final result = await _signInUseCase(
-      VerifyParams(email: email, otp: password),
+      SigninParams(email: email, password: password),
     );
     result.fold(
       (failure) {
         emit(AuthState.error(error: failure.message));
       },
       (success) {
-        emit(AuthState.success(tokens: success));
+        emit(AuthState.success());
       },
     );
   }

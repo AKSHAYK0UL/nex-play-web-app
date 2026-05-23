@@ -1,6 +1,14 @@
 class Validators {
   Validators._();
 
+  //validates username
+  static String? username(String? name) {
+    if (name == null || name.trim().isEmpty) {
+      return 'Name is required';
+    }
+    return null;
+  }
+
   // validates an email address format
   static String? email(String? value) {
     if (value == null || value.trim().isEmpty) return 'Email is required.';
@@ -31,7 +39,7 @@ class Validators {
   }
 
   //password strength checker
-  static int  passwordStrength(String password) {
+  static int passwordStrength(String password) {
     int s = 0;
     if (password.length >= 8) s++;
     if (password.contains(RegExp(r'[A-Z]'))) s++;
