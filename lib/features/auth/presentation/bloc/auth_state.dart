@@ -12,4 +12,5 @@ abstract class AuthState with _$AuthState {
     const factory AuthState.success() = _AuthSuccess;
 
   const factory AuthState.error({required String error}) = _AuthError;
+  const factory AuthState.loggedOut() = _AuthLoggedOut;
 }

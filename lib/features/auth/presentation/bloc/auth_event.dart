@@ -15,4 +15,5 @@ abstract class AuthEvent with _$AuthEvent {
     required String email,
     required String password,
   }) = _AuthSignIn;
+  const factory AuthEvent.logout() = _AuthLogout;
 }

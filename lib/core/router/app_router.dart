@@ -1,4 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nex_play/core/di/injection.dart';
+import 'package:nex_play/features/auth/data/local/auth_local_datasource.dart';
 import 'package:nex_play/features/auth/presentation/screens/auth_screen.dart';
 import 'package:nex_play/features/auth/presentation/screens/landing_screen.dart';
 import 'package:nex_play/features/auth/presentation/screens/verify_screen.dart';
@@ -6,6 +9,13 @@ import 'package:nex_play/features/home/home_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: RoutePath.landingPage,
+  redirect: (context, state) async {
+    final hasTokens = await sl<AuthLocalDatasource>().hasTokens();
+    if (hasTokens && state.matchedLocation == RoutePath.landingPage) {
+      return RoutePath.homeScreen;
+    }
+    return null;
+  },
   routes: [
     GoRoute(
       path: RoutePath.landingPage,
@@ -15,7 +25,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: RoutePath.authScreen,
       name: RouteName.authScreen,
-      builder: (context, state) => const AuthScreen(),
+      pageBuilder: (context, state) => CupertinoPage(
+        key: state.pageKey,
+        child: const AuthScreen(),
+      ),
     ),
     GoRoute(
       path: RoutePath.verifyScreen,

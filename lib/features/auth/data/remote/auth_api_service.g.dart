@@ -29,7 +29,7 @@ class _AuthApiService implements AuthApiService {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            'http://localhost:3000/api/auth/signup',
+            'http://localhost:3000/api/v1/auth/signup',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -56,7 +56,7 @@ class _AuthApiService implements AuthApiService {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            'http://localhost:3000/api/auth/verify',
+            'http://localhost:3000/api/v1/auth/verify',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -83,7 +83,7 @@ class _AuthApiService implements AuthApiService {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            'http://localhost:3000/api/auth/signin',
+            'http://localhost:3000/api/v1/auth/signin',
             queryParameters: queryParameters,
             data: _data,
           )

@@ -55,7 +55,7 @@ extension AuthStatePatterns on AuthState {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _AuthInitial value)?  initial,TResult Function( _AuthLoading value)?  loading,TResult Function( _AuthVerify value)?  verify,TResult Function( _AuthSuccess value)?  success,TResult Function( _AuthError value)?  error,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _AuthInitial value)?  initial,TResult Function( _AuthLoading value)?  loading,TResult Function( _AuthVerify value)?  verify,TResult Function( _AuthSuccess value)?  success,TResult Function( _AuthError value)?  error,TResult Function( _AuthLoggedOut value)?  loggedOut,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case _AuthInitial() when initial != null:
@@ -63,7 +63,8 @@ return initial(_that);case _AuthLoading() when loading != null:
 return loading(_that);case _AuthVerify() when verify != null:
 return verify(_that);case _AuthSuccess() when success != null:
 return success(_that);case _AuthError() when error != null:
-return error(_that);case _:
+return error(_that);case _AuthLoggedOut() when loggedOut != null:
+return loggedOut(_that);case _:
   return orElse();
 
 }
@@ -81,7 +82,7 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _AuthInitial value)  initial,required TResult Function( _AuthLoading value)  loading,required TResult Function( _AuthVerify value)  verify,required TResult Function( _AuthSuccess value)  success,required TResult Function( _AuthError value)  error,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _AuthInitial value)  initial,required TResult Function( _AuthLoading value)  loading,required TResult Function( _AuthVerify value)  verify,required TResult Function( _AuthSuccess value)  success,required TResult Function( _AuthError value)  error,required TResult Function( _AuthLoggedOut value)  loggedOut,}){
 final _that = this;
 switch (_that) {
 case _AuthInitial():
@@ -89,7 +90,8 @@ return initial(_that);case _AuthLoading():
 return loading(_that);case _AuthVerify():
 return verify(_that);case _AuthSuccess():
 return success(_that);case _AuthError():
-return error(_that);case _:
+return error(_that);case _AuthLoggedOut():
+return loggedOut(_that);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -106,7 +108,7 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _AuthInitial value)?  initial,TResult? Function( _AuthLoading value)?  loading,TResult? Function( _AuthVerify value)?  verify,TResult? Function( _AuthSuccess value)?  success,TResult? Function( _AuthError value)?  error,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _AuthInitial value)?  initial,TResult? Function( _AuthLoading value)?  loading,TResult? Function( _AuthVerify value)?  verify,TResult? Function( _AuthSuccess value)?  success,TResult? Function( _AuthError value)?  error,TResult? Function( _AuthLoggedOut value)?  loggedOut,}){
 final _that = this;
 switch (_that) {
 case _AuthInitial() when initial != null:
@@ -114,7 +116,8 @@ return initial(_that);case _AuthLoading() when loading != null:
 return loading(_that);case _AuthVerify() when verify != null:
 return verify(_that);case _AuthSuccess() when success != null:
 return success(_that);case _AuthError() when error != null:
-return error(_that);case _:
+return error(_that);case _AuthLoggedOut() when loggedOut != null:
+return loggedOut(_that);case _:
   return null;
 
 }
@@ -131,14 +134,15 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( String email)?  verify,TResult Function()?  success,TResult Function( String error)?  error,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( String email)?  verify,TResult Function()?  success,TResult Function( String error)?  error,TResult Function()?  loggedOut,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AuthInitial() when initial != null:
 return initial();case _AuthLoading() when loading != null:
 return loading();case _AuthVerify() when verify != null:
 return verify(_that.email);case _AuthSuccess() when success != null:
 return success();case _AuthError() when error != null:
-return error(_that.error);case _:
+return error(_that.error);case _AuthLoggedOut() when loggedOut != null:
+return loggedOut();case _:
   return orElse();
 
 }
@@ -156,14 +160,15 @@ return error(_that.error);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( String email)  verify,required TResult Function()  success,required TResult Function( String error)  error,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( String email)  verify,required TResult Function()  success,required TResult Function( String error)  error,required TResult Function()  loggedOut,}) {final _that = this;
 switch (_that) {
 case _AuthInitial():
 return initial();case _AuthLoading():
 return loading();case _AuthVerify():
 return verify(_that.email);case _AuthSuccess():
 return success();case _AuthError():
-return error(_that.error);case _:
+return error(_that.error);case _AuthLoggedOut():
+return loggedOut();case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -180,14 +185,15 @@ return error(_that.error);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( String email)?  verify,TResult? Function()?  success,TResult? Function( String error)?  error,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( String email)?  verify,TResult? Function()?  success,TResult? Function( String error)?  error,TResult? Function()?  loggedOut,}) {final _that = this;
 switch (_that) {
 case _AuthInitial() when initial != null:
 return initial();case _AuthLoading() when loading != null:
 return loading();case _AuthVerify() when verify != null:
 return verify(_that.email);case _AuthSuccess() when success != null:
 return success();case _AuthError() when error != null:
-return error(_that.error);case _:
+return error(_that.error);case _AuthLoggedOut() when loggedOut != null:
+return loggedOut();case _:
   return null;
 
 }
@@ -422,5 +428,37 @@ as String,
 
 
 }
+
+/// @nodoc
+
+
+class _AuthLoggedOut implements AuthState {
+  const _AuthLoggedOut();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthLoggedOut);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'AuthState.loggedOut()';
+}
+
+
+}
+
+
+
 
 // dart format on

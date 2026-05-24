@@ -8,6 +8,7 @@ import 'package:nex_play/features/auth/data/remote/auth_api_service.dart';
 import 'package:nex_play/features/auth/data/remote/auth_remote_datasource.dart';
 import 'package:nex_play/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:nex_play/features/auth/domain/repositories/auth_repository.dart';
+import 'package:nex_play/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:nex_play/features/auth/domain/usecases/signin_usecase.dart';
 import 'package:nex_play/features/auth/domain/usecases/signup_usecase.dart';
 import 'package:nex_play/features/auth/domain/usecases/verify_usecase.dart';
@@ -57,12 +58,17 @@ Future<void> initDependencies() async {
     () => SigninUsecase(sl<AuthRepository>()),
   );
 
+  sl.registerLazySingleton<LogoutUsecase>(
+    () => LogoutUsecase(sl<AuthRepository>()),
+  );
+
   //Auth BloC
   sl.registerLazySingleton<AuthBloc>(
     () => AuthBloc(
       signUpUseCase: sl<SignupUsecase>(),
       verifyOtpUseCase: sl<VerifyUsecase>(),
       signInUseCase: sl<SigninUsecase>(),
+      logoutUseCase: sl<LogoutUsecase>(),
     ),
   );
 }
