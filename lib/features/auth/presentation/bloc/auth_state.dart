@@ -1,5 +1,4 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:nex_play/features/auth/domain/entities/auth_tokens.dart';
 
 part 'auth_state.freezed.dart';
 

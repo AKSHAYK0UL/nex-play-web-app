@@ -15,5 +15,15 @@ abstract class AuthEvent with _$AuthEvent {
     required String email,
     required String password,
   }) = _AuthSignIn;
+
+  const factory AuthEvent.forgotPassword({required String email}) =
+      _AuthForgotPassword;
+
+  const factory AuthEvent.resetPassword({
+    required String email,
+    required String otp,
+    required String newPassword,
+  }) = _AuthResetPassword;
+
   const factory AuthEvent.logout() = _AuthLogout;
 }

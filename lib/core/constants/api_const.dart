@@ -8,7 +8,7 @@ class ApiConst {
 
   static const String signUp = '$baseUrl/auth/signup';
   static const String verify = '$baseUrl/auth/verify';
-
   static const String signIn = '$baseUrl/auth/signin';
-  // static const String forgotPassword = '$baseUrl/auth/forgot';
+  static const String forgotPassword = '$baseUrl/auth/password/forgot';
+  static const String resetPassword = '$baseUrl/auth/password/reset';
 }

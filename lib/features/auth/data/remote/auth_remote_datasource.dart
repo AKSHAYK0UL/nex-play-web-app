@@ -1,9 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:nex_play/core/errors/exceptions.dart';
 import 'package:nex_play/core/utils/logger.dart';
+import 'package:nex_play/features/auth/data/models/req/forgotpassword_req.dart';
+import 'package:nex_play/features/auth/data/models/req/resetpassword_req.dart';
 import 'package:nex_play/features/auth/data/models/req/signin_req.dart';
 import 'package:nex_play/features/auth/data/models/req/signup_req.dart';
 import 'package:nex_play/features/auth/data/models/req/verify_req.dart';
+import 'package:nex_play/features/auth/data/models/res/forgotpassword_res.dart';
+import 'package:nex_play/features/auth/data/models/res/resetpassword_res.dart';
 import 'package:nex_play/features/auth/data/models/res/signin_res.dart';
 import 'package:nex_play/features/auth/data/models/res/signup_res.dart';
 import 'package:nex_play/features/auth/data/models/res/verify_res.dart';
@@ -18,6 +22,14 @@ abstract interface class AuthRemoteDatasource {
   Future<VerifyRes> verify({required String email, required String otp});
 
   Future<SigninRes> signIn({required String email, required String password});
+
+  Future<ForgotpasswordRes> forgotPassword({required String email});
+
+  Future<ResetpasswordRes> resetPassword({
+    required String email,
+    required String otp,
+    required String newPassword,
+  });
 }
 
 //Impl
@@ -83,6 +95,48 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       return response;
     } on DioException catch (e) {
       AppLogger.error('SignIn failed', error: e);
+
+      _handleDioError(e);
+    }
+  }
+
+  @override
+  Future<ForgotpasswordRes> forgotPassword({required String email}) async {
+    try {
+      AppLogger.info('Attempting Forgot password for: $email');
+      final response = await _apiService.forgotPassword(
+        ForgotPasswordReq(email: email),
+      );
+      AppLogger.info(
+        response.success ? "Forgot password Success" : "Forgot password Failed",
+      );
+
+      return response;
+    } on DioException catch (e) {
+      AppLogger.error('Forgot password failed', error: e);
+
+      _handleDioError(e);
+    }
+  }
+
+  @override
+  Future<ResetpasswordRes> resetPassword({
+    required String email,
+    required String otp,
+    required String newPassword,
+  }) async {
+    try {
+      AppLogger.info('Attempting Reset password for: $email');
+      final response = await _apiService.resetPassword(
+        ResetpasswordReq(email: email, otp: otp, newPassword: newPassword),
+      );
+      AppLogger.info(
+        response.success ? "Reset password Success" : "Reset password Failed",
+      );
+
+      return response;
+    } on DioException catch (e) {
+      AppLogger.error('Reset password failed', error: e);
 
       _handleDioError(e);
     }

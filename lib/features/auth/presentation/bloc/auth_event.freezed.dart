@@ -55,13 +55,15 @@ extension AuthEventPatterns on AuthEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _AuthSignUp value)?  signUp,TResult Function( _AuthVerify value)?  verify,TResult Function( _AuthSignIn value)?  signIn,TResult Function( _AuthLogout value)?  logout,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _AuthSignUp value)?  signUp,TResult Function( _AuthVerify value)?  verify,TResult Function( _AuthSignIn value)?  signIn,TResult Function( _AuthForgotPassword value)?  forgotPassword,TResult Function( _AuthResetPassword value)?  resetPassword,TResult Function( _AuthLogout value)?  logout,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case _AuthSignUp() when signUp != null:
 return signUp(_that);case _AuthVerify() when verify != null:
 return verify(_that);case _AuthSignIn() when signIn != null:
-return signIn(_that);case _AuthLogout() when logout != null:
+return signIn(_that);case _AuthForgotPassword() when forgotPassword != null:
+return forgotPassword(_that);case _AuthResetPassword() when resetPassword != null:
+return resetPassword(_that);case _AuthLogout() when logout != null:
 return logout(_that);case _:
   return orElse();
 
@@ -80,13 +82,15 @@ return logout(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _AuthSignUp value)  signUp,required TResult Function( _AuthVerify value)  verify,required TResult Function( _AuthSignIn value)  signIn,required TResult Function( _AuthLogout value)  logout,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _AuthSignUp value)  signUp,required TResult Function( _AuthVerify value)  verify,required TResult Function( _AuthSignIn value)  signIn,required TResult Function( _AuthForgotPassword value)  forgotPassword,required TResult Function( _AuthResetPassword value)  resetPassword,required TResult Function( _AuthLogout value)  logout,}){
 final _that = this;
 switch (_that) {
 case _AuthSignUp():
 return signUp(_that);case _AuthVerify():
 return verify(_that);case _AuthSignIn():
-return signIn(_that);case _AuthLogout():
+return signIn(_that);case _AuthForgotPassword():
+return forgotPassword(_that);case _AuthResetPassword():
+return resetPassword(_that);case _AuthLogout():
 return logout(_that);case _:
   throw StateError('Unexpected subclass');
 
@@ -104,13 +108,15 @@ return logout(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _AuthSignUp value)?  signUp,TResult? Function( _AuthVerify value)?  verify,TResult? Function( _AuthSignIn value)?  signIn,TResult? Function( _AuthLogout value)?  logout,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _AuthSignUp value)?  signUp,TResult? Function( _AuthVerify value)?  verify,TResult? Function( _AuthSignIn value)?  signIn,TResult? Function( _AuthForgotPassword value)?  forgotPassword,TResult? Function( _AuthResetPassword value)?  resetPassword,TResult? Function( _AuthLogout value)?  logout,}){
 final _that = this;
 switch (_that) {
 case _AuthSignUp() when signUp != null:
 return signUp(_that);case _AuthVerify() when verify != null:
 return verify(_that);case _AuthSignIn() when signIn != null:
-return signIn(_that);case _AuthLogout() when logout != null:
+return signIn(_that);case _AuthForgotPassword() when forgotPassword != null:
+return forgotPassword(_that);case _AuthResetPassword() when resetPassword != null:
+return resetPassword(_that);case _AuthLogout() when logout != null:
 return logout(_that);case _:
   return null;
 
@@ -128,12 +134,14 @@ return logout(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String name,  String email,  String password)?  signUp,TResult Function( String email,  String otp)?  verify,TResult Function( String email,  String password)?  signIn,TResult Function()?  logout,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String name,  String email,  String password)?  signUp,TResult Function( String email,  String otp)?  verify,TResult Function( String email,  String password)?  signIn,TResult Function( String email)?  forgotPassword,TResult Function( String email,  String otp,  String newPassword)?  resetPassword,TResult Function()?  logout,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AuthSignUp() when signUp != null:
 return signUp(_that.name,_that.email,_that.password);case _AuthVerify() when verify != null:
 return verify(_that.email,_that.otp);case _AuthSignIn() when signIn != null:
-return signIn(_that.email,_that.password);case _AuthLogout() when logout != null:
+return signIn(_that.email,_that.password);case _AuthForgotPassword() when forgotPassword != null:
+return forgotPassword(_that.email);case _AuthResetPassword() when resetPassword != null:
+return resetPassword(_that.email,_that.otp,_that.newPassword);case _AuthLogout() when logout != null:
 return logout();case _:
   return orElse();
 
@@ -152,12 +160,14 @@ return logout();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String name,  String email,  String password)  signUp,required TResult Function( String email,  String otp)  verify,required TResult Function( String email,  String password)  signIn,required TResult Function()  logout,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String name,  String email,  String password)  signUp,required TResult Function( String email,  String otp)  verify,required TResult Function( String email,  String password)  signIn,required TResult Function( String email)  forgotPassword,required TResult Function( String email,  String otp,  String newPassword)  resetPassword,required TResult Function()  logout,}) {final _that = this;
 switch (_that) {
 case _AuthSignUp():
 return signUp(_that.name,_that.email,_that.password);case _AuthVerify():
 return verify(_that.email,_that.otp);case _AuthSignIn():
-return signIn(_that.email,_that.password);case _AuthLogout():
+return signIn(_that.email,_that.password);case _AuthForgotPassword():
+return forgotPassword(_that.email);case _AuthResetPassword():
+return resetPassword(_that.email,_that.otp,_that.newPassword);case _AuthLogout():
 return logout();case _:
   throw StateError('Unexpected subclass');
 
@@ -175,12 +185,14 @@ return logout();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String name,  String email,  String password)?  signUp,TResult? Function( String email,  String otp)?  verify,TResult? Function( String email,  String password)?  signIn,TResult? Function()?  logout,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String name,  String email,  String password)?  signUp,TResult? Function( String email,  String otp)?  verify,TResult? Function( String email,  String password)?  signIn,TResult? Function( String email)?  forgotPassword,TResult? Function( String email,  String otp,  String newPassword)?  resetPassword,TResult? Function()?  logout,}) {final _that = this;
 switch (_that) {
 case _AuthSignUp() when signUp != null:
 return signUp(_that.name,_that.email,_that.password);case _AuthVerify() when verify != null:
 return verify(_that.email,_that.otp);case _AuthSignIn() when signIn != null:
-return signIn(_that.email,_that.password);case _AuthLogout() when logout != null:
+return signIn(_that.email,_that.password);case _AuthForgotPassword() when forgotPassword != null:
+return forgotPassword(_that.email);case _AuthResetPassword() when resetPassword != null:
+return resetPassword(_that.email,_that.otp,_that.newPassword);case _AuthLogout() when logout != null:
 return logout();case _:
   return null;
 
@@ -388,6 +400,142 @@ class __$AuthSignInCopyWithImpl<$Res>
   return _then(_AuthSignIn(
 email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,password: null == password ? _self.password : password // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class _AuthForgotPassword implements AuthEvent {
+  const _AuthForgotPassword({required this.email});
+  
+
+ final  String email;
+
+/// Create a copy of AuthEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$AuthForgotPasswordCopyWith<_AuthForgotPassword> get copyWith => __$AuthForgotPasswordCopyWithImpl<_AuthForgotPassword>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthForgotPassword&&(identical(other.email, email) || other.email == email));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,email);
+
+@override
+String toString() {
+  return 'AuthEvent.forgotPassword(email: $email)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$AuthForgotPasswordCopyWith<$Res> implements $AuthEventCopyWith<$Res> {
+  factory _$AuthForgotPasswordCopyWith(_AuthForgotPassword value, $Res Function(_AuthForgotPassword) _then) = __$AuthForgotPasswordCopyWithImpl;
+@useResult
+$Res call({
+ String email
+});
+
+
+
+
+}
+/// @nodoc
+class __$AuthForgotPasswordCopyWithImpl<$Res>
+    implements _$AuthForgotPasswordCopyWith<$Res> {
+  __$AuthForgotPasswordCopyWithImpl(this._self, this._then);
+
+  final _AuthForgotPassword _self;
+  final $Res Function(_AuthForgotPassword) _then;
+
+/// Create a copy of AuthEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? email = null,}) {
+  return _then(_AuthForgotPassword(
+email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class _AuthResetPassword implements AuthEvent {
+  const _AuthResetPassword({required this.email, required this.otp, required this.newPassword});
+  
+
+ final  String email;
+ final  String otp;
+ final  String newPassword;
+
+/// Create a copy of AuthEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$AuthResetPasswordCopyWith<_AuthResetPassword> get copyWith => __$AuthResetPasswordCopyWithImpl<_AuthResetPassword>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthResetPassword&&(identical(other.email, email) || other.email == email)&&(identical(other.otp, otp) || other.otp == otp)&&(identical(other.newPassword, newPassword) || other.newPassword == newPassword));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,email,otp,newPassword);
+
+@override
+String toString() {
+  return 'AuthEvent.resetPassword(email: $email, otp: $otp, newPassword: $newPassword)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$AuthResetPasswordCopyWith<$Res> implements $AuthEventCopyWith<$Res> {
+  factory _$AuthResetPasswordCopyWith(_AuthResetPassword value, $Res Function(_AuthResetPassword) _then) = __$AuthResetPasswordCopyWithImpl;
+@useResult
+$Res call({
+ String email, String otp, String newPassword
+});
+
+
+
+
+}
+/// @nodoc
+class __$AuthResetPasswordCopyWithImpl<$Res>
+    implements _$AuthResetPasswordCopyWith<$Res> {
+  __$AuthResetPasswordCopyWithImpl(this._self, this._then);
+
+  final _AuthResetPassword _self;
+  final $Res Function(_AuthResetPassword) _then;
+
+/// Create a copy of AuthEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? email = null,Object? otp = null,Object? newPassword = null,}) {
+  return _then(_AuthResetPassword(
+email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
+as String,otp: null == otp ? _self.otp : otp // ignore: cast_nullable_to_non_nullable
+as String,newPassword: null == newPassword ? _self.newPassword : newPassword // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
