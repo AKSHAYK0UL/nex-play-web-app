@@ -154,11 +154,11 @@ Never _handleDioError(DioException e) {
       final statusCode = e.response?.statusCode;
       if (statusCode == 401 || statusCode == 403) {
         throw AuthException(
-          e.response?.data?['message'] ?? 'Invalid credentials.',
+          e.response?.data?['message']?? 'Invalid credentials.',
         );
       }
       throw ServerException(
-        e.response?.data?['message'] ?? 'Server error: $statusCode',
+        e.response?.data?['message']=="could not sign in"?"email not verified":  e.response?.data?['message'] ?? 'Server error: $statusCode',
       );
     default:
       throw ServerException(e.message ?? 'An unexpected error occurred.');

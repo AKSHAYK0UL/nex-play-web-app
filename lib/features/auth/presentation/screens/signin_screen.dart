@@ -165,7 +165,7 @@ class _SigninScreenState extends State<SigninScreen>
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: () =>context.push(RoutePath.forgotPassword),
                     style: TextButton.styleFrom(
                       foregroundColor: AppTheme.red,
                       padding: const EdgeInsets.symmetric(

@@ -12,13 +12,14 @@ import 'package:nex_play/features/auth/presentation/bloc/auth_event.dart';
 import 'package:nex_play/features/auth/presentation/bloc/auth_state.dart';
 import 'package:nex_play/features/auth/presentation/widgets/auth_button.dart';
 import 'package:nex_play/features/auth/presentation/widgets/back_button.dart';
-import 'package:nex_play/features/auth/presentation/widgets/email_icon_mark.dart';
+import 'package:nex_play/features/auth/presentation/widgets/icon_mark.dart';
 import 'package:nex_play/features/auth/presentation/widgets/otp_boxes.dart';
 import 'package:nex_play/features/auth/presentation/widgets/verify_header_text.dart';
 
 class VerifyScreen extends StatefulWidget {
   final String email;
-  const VerifyScreen({super.key, required this.email});
+  final String password;
+  const VerifyScreen({super.key, required this.email, this.password = ""});
 
   @override
   State<VerifyScreen> createState() => _VerifyScreenState();
@@ -124,6 +125,10 @@ class _VerifyScreenState extends State<VerifyScreen>
 
   //Input
   void _onDigitEntered(int index, String value) {
+    setState(() {
+      _hasError = false;
+      _errorMessage = "";
+    });
     final clean = value.replaceAll(RegExp(r'[^0-9]'), '');
     if (clean.isEmpty) {
       _controllers[index].clear();
@@ -152,6 +157,10 @@ class _VerifyScreenState extends State<VerifyScreen>
   }
 
   void _onBackspace(int index) {
+    setState(() {
+      _hasError = false;
+      _errorMessage = "";
+    });
     if (_controllers[index].text.isEmpty && index > 0) {
       _controllers[index - 1].clear();
       _focusNodes[index - 1].requestFocus();
@@ -159,6 +168,10 @@ class _VerifyScreenState extends State<VerifyScreen>
   }
 
   void _maybeAutoSubmit() {
+    setState(() {
+      _hasError = false;
+      _errorMessage = "";
+    });
     if (_controllers.every((c) => c.text.isNotEmpty)) {
       _submitOTP();
     }
@@ -167,19 +180,40 @@ class _VerifyScreenState extends State<VerifyScreen>
   //verify
   void _submitOTP() {
     final otpCode = _controllers.map((c) => c.text).join();
-    if (otpCode.length < ApiConst.otpCodeLenght) return;
+    if (otpCode.length < ApiConst.otpCodeLenght) {
+      setState(() {
+        _hasError = true;
+        _errorMessage = "incomplete OTP";
+      });
+      _buildErrorBanner();
+      return;
+    }
+    ;
     HapticFeedback.lightImpact();
 
-    context.read<AuthBloc>().add(
-      AuthEvent.verify(email: widget.email, otp: otpCode),
-    );
+    if (widget.password.isEmpty) {
+      context.read<AuthBloc>().add(
+        AuthEvent.verify(email: widget.email, otp: otpCode),
+      );
+    } else {
+      context.read<AuthBloc>().add(
+        AuthEvent.resetPassword(
+          email: widget.email,
+          otp: otpCode,
+          newPassword: widget.password,
+        ),
+      );
+    }
   }
 
   void _clearFields() {
     for (final c in _controllers) {
       c.clear();
     }
-    setState(() {}); // rebuild to reflect empty state
+    setState(() {
+      _hasError = false;
+      _errorMessage = "";
+    }); // rebuild to reflect empty state
     _focusNodes[0].requestFocus();
   }
 
@@ -188,7 +222,8 @@ class _VerifyScreenState extends State<VerifyScreen>
     HapticFeedback.selectionClick();
     _clearFields();
     _startTimer();
-    // TODO: trigger  resend API call
+
+    context.read<AuthBloc>().add(AuthEvent.resentOTP(email: widget.email));
   }
 
   @override
@@ -237,11 +272,18 @@ class _VerifyScreenState extends State<VerifyScreen>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const SizedBox(height: 24),
-                            emailIconMark(),
+                            iconMark(Icons.mark_email_read_outlined),
                             const SizedBox(height: 28),
                             verifyHeaderText(widget.email),
                             const SizedBox(height: 44),
-                            _buildOtpBoxes(),
+                            otpBoxes(
+                              shakeAnim: _shakeAnim,
+                              focusNodes: _focusNodes,
+                              controllers: _controllers,
+                              hasError: _hasError,
+                              onDigitEntered: _onDigitEntered,
+                              onBackspace: _onBackspace,
+                            ),
                             const SizedBox(height: 16),
                             _buildErrorBanner(),
                             const SizedBox(height: 36),
@@ -264,17 +306,6 @@ class _VerifyScreenState extends State<VerifyScreen>
           ),
         );
       },
-    );
-  }
-
-  Widget _buildOtpBoxes() {
-    return otpBoxes(
-      shakeAnim: _shakeAnim,
-      focusNodes: _focusNodes,
-      controllers: _controllers,
-      hasError: _hasError,
-      onDigitEntered: _onDigitEntered,
-      onBackspace: _onBackspace,
     );
   }
 

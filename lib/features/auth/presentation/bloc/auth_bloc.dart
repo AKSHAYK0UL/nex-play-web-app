@@ -37,8 +37,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             _signUpEvent(name, email, password, emit),
         verify: (email, otp) => _verifyEvent(email, otp, emit),
         signIn: (email, password) => _signInEvent(email, password, emit),
-        forgotPassword: (email) =>_forgotPasswordEvent(email, emit),
-        resetPassword: (email, otp, newPassword) => _resetPasswordEvent(email, otp, newPassword, emit),
+        forgotPassword: (email) => _forgotPasswordEvent(email, emit),
+        resetPassword: (email, otp, newPassword) =>
+            _resetPasswordEvent(email, otp, newPassword, emit),
+        resentOTP: (email) => _resentOTPEvent(email),
         logout: () => _logoutEvent(emit),
       );
     });
@@ -141,6 +143,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         emit(AuthState.success());
       },
     );
+  }
+
+  Future<void> _resentOTPEvent(String email) async {
+    await _forgotpasswordUsecase(
+      ForgotPasswordParams(email: email),
+    );
+    
   }
 
   Future<void> _logoutEvent(Emitter<AuthState> emit) async {

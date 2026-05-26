@@ -4,7 +4,7 @@ class ApiConst {
   static const int receiveTimeout = 30;
   static const int otpCodeLenght = 6;
 
-  static const String baseUrl = 'http://localhost:3000/api/v1';
+  static const String baseUrl = 'http://localhost:8080/api/v1';
 
   static const String signUp = '$baseUrl/auth/signup';
   static const String verify = '$baseUrl/auth/verify';

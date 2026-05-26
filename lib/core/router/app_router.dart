@@ -1,8 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nex_play/core/di/injection.dart';
 import 'package:nex_play/features/auth/data/local/auth_local_datasource.dart';
 import 'package:nex_play/features/auth/presentation/screens/auth_screen.dart';
+import 'package:nex_play/features/auth/presentation/screens/forgotpassword_screen.dart';
 import 'package:nex_play/features/auth/presentation/screens/landing_screen.dart';
 import 'package:nex_play/features/auth/presentation/screens/verify_screen.dart';
 import 'package:nex_play/features/home/home_screen.dart';
@@ -25,15 +25,22 @@ final appRouter = GoRouter(
     GoRoute(
       path: RoutePath.authScreen,
       name: RouteName.authScreen,
-      pageBuilder: (context, state) => CupertinoPage(
-        key: state.pageKey,
-        child: const AuthScreen(),
-      ),
+      builder: (context, state) => const AuthScreen(),
+    ),
+    GoRoute(
+      path: RoutePath.forgotPassword,
+      name: RouteName.forgotPassword,
+      builder: (context, state) => const ForgotpasswordScreen(),
     ),
     GoRoute(
       path: RoutePath.verifyScreen,
       name: RouteName.verifyScreen,
-      builder: (context, state) => VerifyScreen(email: state.extra as String),
+      builder: (context, state) {
+        final routeData = state.extra as Map<String, String>;
+        final email = routeData['email'] as String;
+        final password = routeData['password'] as String;
+        return VerifyScreen(email: email, password: password);
+      },
     ),
     GoRoute(
       path: RoutePath.homeScreen,
@@ -48,6 +55,7 @@ class RoutePath {
   static const String landingPage = "/landing_page";
   static const String authScreen = "/auth_screen";
   static const String verifyScreen = "/verify_screen";
+  static const String forgotPassword = "/forgot_password";
   static const String homeScreen = "/home_screen";
 }
 
@@ -56,5 +64,6 @@ class RouteName {
   static const String landingPage = "landing_page";
   static const String authScreen = "auth_screen";
   static const String verifyScreen = "verify_screen";
+  static const String forgotPassword = "forgot_password";
   static const String homeScreen = "home_screen";
 }

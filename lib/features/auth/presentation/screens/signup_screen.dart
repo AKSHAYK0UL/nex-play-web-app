@@ -86,7 +86,7 @@ class _SignupScreenState extends State<SignupScreen>
       listenWhen: (previous, current) => previous != current,
       listener: (context, state) {
         state.maybeWhen(
-          verify: (email) => context.push(RoutePath.verifyScreen, extra: email),
+          verify: (email) => context.push(RoutePath.verifyScreen, extra:  {"email": email, "password": ""}),
           error: (error) => showSnack(context, error),
           orElse: () {},
         );
