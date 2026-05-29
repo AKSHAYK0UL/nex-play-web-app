@@ -137,7 +137,7 @@ return logout(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String name,  String email,  String password)?  signUp,TResult Function( String email,  String otp)?  verify,TResult Function( String email,  String password)?  signIn,TResult Function( String email)?  forgotPassword,TResult Function( String email,  String otp,  String newPassword)?  resetPassword,TResult Function( String email)?  resentOTP,TResult Function()?  logout,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String name,  String email,  String password)?  signUp,TResult Function( String email,  String otp)?  verify,TResult Function( String email,  String password)?  signIn,TResult Function( String email)?  forgotPassword,TResult Function( String email,  String otp,  String newPassword)?  resetPassword,TResult Function( String email,  String purpose)?  resentOTP,TResult Function()?  logout,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AuthSignUp() when signUp != null:
 return signUp(_that.name,_that.email,_that.password);case _AuthVerify() when verify != null:
@@ -145,7 +145,7 @@ return verify(_that.email,_that.otp);case _AuthSignIn() when signIn != null:
 return signIn(_that.email,_that.password);case _AuthForgotPassword() when forgotPassword != null:
 return forgotPassword(_that.email);case _AuthResetPassword() when resetPassword != null:
 return resetPassword(_that.email,_that.otp,_that.newPassword);case _AuthResentOTP() when resentOTP != null:
-return resentOTP(_that.email);case _AuthLogout() when logout != null:
+return resentOTP(_that.email,_that.purpose);case _AuthLogout() when logout != null:
 return logout();case _:
   return orElse();
 
@@ -164,7 +164,7 @@ return logout();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String name,  String email,  String password)  signUp,required TResult Function( String email,  String otp)  verify,required TResult Function( String email,  String password)  signIn,required TResult Function( String email)  forgotPassword,required TResult Function( String email,  String otp,  String newPassword)  resetPassword,required TResult Function( String email)  resentOTP,required TResult Function()  logout,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String name,  String email,  String password)  signUp,required TResult Function( String email,  String otp)  verify,required TResult Function( String email,  String password)  signIn,required TResult Function( String email)  forgotPassword,required TResult Function( String email,  String otp,  String newPassword)  resetPassword,required TResult Function( String email,  String purpose)  resentOTP,required TResult Function()  logout,}) {final _that = this;
 switch (_that) {
 case _AuthSignUp():
 return signUp(_that.name,_that.email,_that.password);case _AuthVerify():
@@ -172,7 +172,7 @@ return verify(_that.email,_that.otp);case _AuthSignIn():
 return signIn(_that.email,_that.password);case _AuthForgotPassword():
 return forgotPassword(_that.email);case _AuthResetPassword():
 return resetPassword(_that.email,_that.otp,_that.newPassword);case _AuthResentOTP():
-return resentOTP(_that.email);case _AuthLogout():
+return resentOTP(_that.email,_that.purpose);case _AuthLogout():
 return logout();case _:
   throw StateError('Unexpected subclass');
 
@@ -190,7 +190,7 @@ return logout();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String name,  String email,  String password)?  signUp,TResult? Function( String email,  String otp)?  verify,TResult? Function( String email,  String password)?  signIn,TResult? Function( String email)?  forgotPassword,TResult? Function( String email,  String otp,  String newPassword)?  resetPassword,TResult? Function( String email)?  resentOTP,TResult? Function()?  logout,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String name,  String email,  String password)?  signUp,TResult? Function( String email,  String otp)?  verify,TResult? Function( String email,  String password)?  signIn,TResult? Function( String email)?  forgotPassword,TResult? Function( String email,  String otp,  String newPassword)?  resetPassword,TResult? Function( String email,  String purpose)?  resentOTP,TResult? Function()?  logout,}) {final _that = this;
 switch (_that) {
 case _AuthSignUp() when signUp != null:
 return signUp(_that.name,_that.email,_that.password);case _AuthVerify() when verify != null:
@@ -198,7 +198,7 @@ return verify(_that.email,_that.otp);case _AuthSignIn() when signIn != null:
 return signIn(_that.email,_that.password);case _AuthForgotPassword() when forgotPassword != null:
 return forgotPassword(_that.email);case _AuthResetPassword() when resetPassword != null:
 return resetPassword(_that.email,_that.otp,_that.newPassword);case _AuthResentOTP() when resentOTP != null:
-return resentOTP(_that.email);case _AuthLogout() when logout != null:
+return resentOTP(_that.email,_that.purpose);case _AuthLogout() when logout != null:
 return logout();case _:
   return null;
 
@@ -553,10 +553,11 @@ as String,
 
 
 class _AuthResentOTP implements AuthEvent {
-  const _AuthResentOTP({required this.email});
+  const _AuthResentOTP({required this.email, required this.purpose});
   
 
  final  String email;
+ final  String purpose;
 
 /// Create a copy of AuthEvent
 /// with the given fields replaced by the non-null parameter values.
@@ -568,16 +569,16 @@ _$AuthResentOTPCopyWith<_AuthResentOTP> get copyWith => __$AuthResentOTPCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthResentOTP&&(identical(other.email, email) || other.email == email));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthResentOTP&&(identical(other.email, email) || other.email == email)&&(identical(other.purpose, purpose) || other.purpose == purpose));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,email);
+int get hashCode => Object.hash(runtimeType,email,purpose);
 
 @override
 String toString() {
-  return 'AuthEvent.resentOTP(email: $email)';
+  return 'AuthEvent.resentOTP(email: $email, purpose: $purpose)';
 }
 
 
@@ -588,7 +589,7 @@ abstract mixin class _$AuthResentOTPCopyWith<$Res> implements $AuthEventCopyWith
   factory _$AuthResentOTPCopyWith(_AuthResentOTP value, $Res Function(_AuthResentOTP) _then) = __$AuthResentOTPCopyWithImpl;
 @useResult
 $Res call({
- String email
+ String email, String purpose
 });
 
 
@@ -605,9 +606,10 @@ class __$AuthResentOTPCopyWithImpl<$Res>
 
 /// Create a copy of AuthEvent
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? email = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? email = null,Object? purpose = null,}) {
   return _then(_AuthResentOTP(
 email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
+as String,purpose: null == purpose ? _self.purpose : purpose // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }

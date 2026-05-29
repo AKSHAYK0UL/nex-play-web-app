@@ -10,6 +10,7 @@ import 'package:nex_play/features/auth/data/repositories/auth_repository_impl.da
 import 'package:nex_play/features/auth/domain/repositories/auth_repository.dart';
 import 'package:nex_play/features/auth/domain/usecases/forgotpassword_usecase.dart';
 import 'package:nex_play/features/auth/domain/usecases/logout_usecase.dart';
+import 'package:nex_play/features/auth/domain/usecases/resent_otp_usecase.dart';
 import 'package:nex_play/features/auth/domain/usecases/resetpassword_usecase.dart';
 import 'package:nex_play/features/auth/domain/usecases/signin_usecase.dart';
 import 'package:nex_play/features/auth/domain/usecases/signup_usecase.dart';
@@ -33,7 +34,12 @@ Future<void> initDependencies() async {
   final authTokens = await sl<AuthLocalDatasource>().getTokens();
 
   // NETWORK (Dio + Retrofit)
-  sl.registerLazySingleton<Dio>(() => createDio(token: authTokens?.token));
+  sl.registerLazySingleton<Dio>(
+    () => createDio(
+      token: authTokens?.token,
+      localDatasource: sl<AuthLocalDatasource>(),
+    ),
+  );
   sl.registerLazySingleton<AuthApiService>(() => AuthApiService(sl<Dio>()));
 
   //REMOTE DATA SOURCE
@@ -64,6 +70,10 @@ Future<void> initDependencies() async {
     () => LogoutUsecase(sl<AuthRepository>()),
   );
 
+  sl.registerLazySingleton<ResentOtpUsecase>(
+    () => ResentOtpUsecase(sl<AuthRepository>()),
+  );
+
   sl.registerLazySingleton<ForgotpasswordUsecase>(
     () => ForgotpasswordUsecase(sl<AuthRepository>()),
   );
@@ -78,6 +88,7 @@ Future<void> initDependencies() async {
       signUpUseCase: sl<SignupUsecase>(),
       verifyOtpUseCase: sl<VerifyUsecase>(),
       signInUseCase: sl<SigninUsecase>(),
+      resentOtpUsecase: sl<ResentOtpUsecase>(),
       forgotpasswordUsecase: sl<ForgotpasswordUsecase>(),
       resetpasswordUsecase: sl<ResetpasswordUsecase>(),
       logoutUseCase: sl<LogoutUsecase>(),

@@ -1,7 +1,6 @@
 //This class implements the AuthRepository interface defined in
 // the Domain layer. It's the bridge between Domain and Data.
 
-import 'package:dio/dio.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:nex_play/core/errors/exceptions.dart';
 import 'package:nex_play/core/errors/failures.dart';
@@ -103,6 +102,30 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+      
+  @override
+  Future<Either<Failure, String>> resentOTP({required String email, required String purpose})async {
+    try {
+      final response = await _remoteDataSource.resentOTP(
+        email: email,
+        purpose: purpose,
+      );
+    
+      return right(
+        response.message
+      );
+    } on AuthException catch (e) {
+      return Left(AuthFailure(e.message));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+
   @override
   Future<Either<Failure, void>> logout() async {
     try {
@@ -114,6 +137,7 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(ServerFailure(e.toString()));
     }
   }
+
 
   @override
   Future<Either<Failure, String>> forgotPassword({
@@ -165,4 +189,5 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(ServerFailure(e.toString()));
     }
   }
+
 }

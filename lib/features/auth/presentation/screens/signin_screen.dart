@@ -97,7 +97,7 @@ class _SigninScreenState extends State<SigninScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Welcome\nback.',
+                  'Welcome\nback!',
                   style: TextStyle(
                     color: AppTheme.text,
                     fontSize: 30,

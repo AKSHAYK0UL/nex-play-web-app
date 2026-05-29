@@ -2,11 +2,13 @@ import 'package:dio/dio.dart';
 import 'package:nex_play/core/errors/exceptions.dart';
 import 'package:nex_play/core/utils/logger.dart';
 import 'package:nex_play/features/auth/data/models/req/forgotpassword_req.dart';
+import 'package:nex_play/features/auth/data/models/req/resent_otp_req.dart';
 import 'package:nex_play/features/auth/data/models/req/resetpassword_req.dart';
 import 'package:nex_play/features/auth/data/models/req/signin_req.dart';
 import 'package:nex_play/features/auth/data/models/req/signup_req.dart';
 import 'package:nex_play/features/auth/data/models/req/verify_req.dart';
 import 'package:nex_play/features/auth/data/models/res/forgotpassword_res.dart';
+import 'package:nex_play/features/auth/data/models/res/resent_otp_res.dart';
 import 'package:nex_play/features/auth/data/models/res/resetpassword_res.dart';
 import 'package:nex_play/features/auth/data/models/res/signin_res.dart';
 import 'package:nex_play/features/auth/data/models/res/signup_res.dart';
@@ -22,6 +24,11 @@ abstract interface class AuthRemoteDatasource {
   Future<VerifyRes> verify({required String email, required String otp});
 
   Future<SigninRes> signIn({required String email, required String password});
+
+  Future<ResentOTPRes> resentOTP({
+    required String email,
+    required String purpose,
+  });
 
   Future<ForgotpasswordRes> forgotPassword({required String email});
 
@@ -101,6 +108,29 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   }
 
   @override
+  Future<ResentOTPRes> resentOTP({
+    required String email,
+    required String purpose,
+  }) async {
+    try {
+      AppLogger.info('Attempting resent OTP for: $email');
+
+      final response = await _apiService.resentOTP(
+        ResentOTPReq(email: email, purpose: purpose),
+      );
+
+      AppLogger.info(
+        response.success ? "resent OTP Success" : "resent OTP Failed",
+      );
+      return response;
+    } on DioException catch (e) {
+      AppLogger.error('resent OTP failed', error: e);
+
+      _handleDioError(e);
+    }
+  }
+
+  @override
   Future<ForgotpasswordRes> forgotPassword({required String email}) async {
     try {
       AppLogger.info('Attempting Forgot password for: $email');
@@ -154,11 +184,13 @@ Never _handleDioError(DioException e) {
       final statusCode = e.response?.statusCode;
       if (statusCode == 401 || statusCode == 403) {
         throw AuthException(
-          e.response?.data?['message']?? 'Invalid credentials.',
+          e.response?.data?['message'] ?? 'Invalid credentials.',
         );
       }
       throw ServerException(
-        e.response?.data?['message']=="could not sign in"?"email not verified":  e.response?.data?['message'] ?? 'Server error: $statusCode',
+        e.response?.data?['message'] == "could not sign in"
+            ? "email not verified"
+            : e.response?.data?['message'] ?? 'Server error: $statusCode',
       );
     default:
       throw ServerException(e.message ?? 'An unexpected error occurred.');

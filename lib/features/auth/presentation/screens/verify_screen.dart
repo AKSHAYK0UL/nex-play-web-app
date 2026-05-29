@@ -223,7 +223,12 @@ class _VerifyScreenState extends State<VerifyScreen>
     _clearFields();
     _startTimer();
 
-    context.read<AuthBloc>().add(AuthEvent.resentOTP(email: widget.email));
+    context.read<AuthBloc>().add(
+      AuthEvent.resentOTP(
+        email: widget.email,
+        purpose: widget.password.isEmpty ? "signup" : "reset_password",
+      ),
+    );
   }
 
   @override

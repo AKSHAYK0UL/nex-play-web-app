@@ -19,6 +19,13 @@ abstract interface class AuthRepository {
     required String password,
   });
 
+
+  Future<Either<Failure, String>> resentOTP({
+    required String email,
+    required String purpose,
+  });
+
+
   Future<Either<Failure, String>> forgotPassword({required String email});
 
   Future<Either<Failure, AuthTokens>> resetPassword({

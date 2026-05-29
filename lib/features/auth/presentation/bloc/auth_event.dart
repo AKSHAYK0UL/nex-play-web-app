@@ -26,7 +26,7 @@ abstract class AuthEvent with _$AuthEvent {
     required String newPassword,
   }) = _AuthResetPassword;
 
-  const factory AuthEvent.resentOTP({required String email}) =
+  const factory AuthEvent.resentOTP({required String email,required String purpose}) =
       _AuthResentOTP;
 
   const factory AuthEvent.logout() = _AuthLogout;

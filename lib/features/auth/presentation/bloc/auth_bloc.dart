@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:nex_play/features/auth/domain/usecases/forgotpassword_usecase.dart';
 import 'package:nex_play/features/auth/domain/usecases/logout_usecase.dart';
+import 'package:nex_play/features/auth/domain/usecases/resent_otp_usecase.dart';
 import 'package:nex_play/features/auth/domain/usecases/resetpassword_usecase.dart';
 import 'package:nex_play/features/auth/domain/usecases/signin_usecase.dart';
 import 'package:nex_play/features/auth/domain/usecases/signup_usecase.dart';
@@ -13,6 +14,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final SignupUsecase _signUpUseCase;
   final VerifyUsecase _verifyOtpUseCase;
   final SigninUsecase _signInUseCase;
+  final ResentOtpUsecase _resentOtpUsecase;
   final LogoutUsecase _logoutUseCase;
   final ForgotpasswordUsecase _forgotpasswordUsecase;
   final ResetpasswordUsecase _resetpasswordUsecase;
@@ -21,12 +23,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required SignupUsecase signUpUseCase,
     required VerifyUsecase verifyOtpUseCase,
     required SigninUsecase signInUseCase,
+    required ResentOtpUsecase resentOtpUsecase,
     required LogoutUsecase logoutUseCase,
     required ForgotpasswordUsecase forgotpasswordUsecase,
     required ResetpasswordUsecase resetpasswordUsecase,
   }) : _signUpUseCase = signUpUseCase,
        _verifyOtpUseCase = verifyOtpUseCase,
        _signInUseCase = signInUseCase,
+       _resentOtpUsecase = resentOtpUsecase,
        _logoutUseCase = logoutUseCase,
        _forgotpasswordUsecase = forgotpasswordUsecase,
        _resetpasswordUsecase = resetpasswordUsecase,
@@ -40,7 +44,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         forgotPassword: (email) => _forgotPasswordEvent(email, emit),
         resetPassword: (email, otp, newPassword) =>
             _resetPasswordEvent(email, otp, newPassword, emit),
-        resentOTP: (email) => _resentOTPEvent(email),
+        resentOTP: (email,purpose) => _resentOTPEvent(email,purpose),
         logout: () => _logoutEvent(emit),
       );
     });
@@ -106,6 +110,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
   }
 
+
+    Future<void> _resentOTPEvent(String email, String purpose) async {
+    await _resentOtpUsecase(ResentOTPParams(email: email, purpose: purpose));
+  }
+
   Future<void> _forgotPasswordEvent(
     String email,
     Emitter<AuthState> emit,
@@ -145,12 +154,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
   }
 
-  Future<void> _resentOTPEvent(String email) async {
-    await _forgotpasswordUsecase(
-      ForgotPasswordParams(email: email),
-    );
-    
-  }
+
 
   Future<void> _logoutEvent(Emitter<AuthState> emit) async {
     emit(const AuthState.loading());
