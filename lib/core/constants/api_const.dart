@@ -13,4 +13,7 @@ class ApiConst {
   static const String resentOTP = '$baseUrl/auth/otp/resend';
   static const String forgotPassword = '$baseUrl/auth/password/forgot';
   static const String resetPassword = '$baseUrl/auth/password/reset';
+
+  // Movie
+  static const String movieDetails = '$baseUrl/movie/details';
 }

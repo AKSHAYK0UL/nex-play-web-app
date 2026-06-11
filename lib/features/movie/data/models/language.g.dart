@@ -1,0 +1,21 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'language.dart';
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+_SpokenLanguage _$SpokenLanguageFromJson(Map<String, dynamic> json) =>
+    _SpokenLanguage(
+      iso6391: json['iso_639_1'] as String,
+      name: json['name'] as String,
+      englishName: json['english_name'] as String?,
+    );
+
+Map<String, dynamic> _$SpokenLanguageToJson(_SpokenLanguage instance) =>
+    <String, dynamic>{
+      'iso_639_1': instance.iso6391,
+      'name': instance.name,
+      'english_name': instance.englishName,
+    };
