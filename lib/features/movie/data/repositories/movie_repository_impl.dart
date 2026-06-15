@@ -81,8 +81,21 @@ class MovieRepositoryImpl implements MovieRepository {
     required int id,
     required String lang,
     required int page,
-  }) {
-    throw UnimplementedError();
+  })async {
+     try {
+      final movieRecommendations = await _movieRemoteDatasource.getRecommendations(
+        id: id,
+        lang: lang,
+        page: page,
+      );
+      return right(movieRecommendations.toEntityMapped((m) => m.toEntity()));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
   }
 
   @override
@@ -90,18 +103,41 @@ class MovieRepositoryImpl implements MovieRepository {
     required int id,
     required String lang,
     required int page,
-  }) {
-    // TODO: implement getSimilar
-    throw UnimplementedError();
+  }) async{
+    try {
+      final similarMovie = await _movieRemoteDatasource.getSimilar(
+        id: id,
+        lang: lang,
+        page: page,
+      );
+      return right(similarMovie.toEntityMapped((m) => m.toEntity()));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
   }
 
   @override
   Future<Either<Failure, PagedResullt<Movie>>> getTopRated({
     required String lang,
     required int page,
-  }) {
-    // TODO: implement getTopRated
-    throw UnimplementedError();
+  }) async{
+     try {
+      final topRatedMovie = await _movieRemoteDatasource.getTopRated(
+        lang: lang,
+        page: page,
+      );
+      return right(topRatedMovie.toEntityMapped((m) => m.toEntity()));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
   }
 
   @override
@@ -109,17 +145,40 @@ class MovieRepositoryImpl implements MovieRepository {
     required String lang,
     required TimeWindow time,
     required int page,
-  }) {
-    // TODO: implement getTrending
-    throw UnimplementedError();
+  }) async{
+    try {
+      final trendingMovie = await _movieRemoteDatasource.getTrending(
+        lang: lang,
+        time: time,
+        page: page,
+      );
+      return right(trendingMovie.toEntityMapped((m) => m.toEntity()));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
   }
 
   @override
   Future<Either<Failure, PagedResullt<Movie>>> getUpcoming({
     required String lang,
     required int page,
-  }) {
-    // TODO: implement getUpcoming
-    throw UnimplementedError();
+  }) async{
+     try {
+      final upcomingMovie = await _movieRemoteDatasource.getUpcoming(
+        lang: lang,
+        page: page,
+      );
+      return right(upcomingMovie.toEntityMapped((m) => m.toEntity()));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(e.message));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
   }
 }
