@@ -1,3 +1,5 @@
+//used in data/models
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'paged.freezed.dart';

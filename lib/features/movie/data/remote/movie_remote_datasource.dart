@@ -3,6 +3,7 @@ import 'package:nex_play/core/enums/time_window.dart';
 import 'package:nex_play/core/errors/exceptions.dart';
 import 'package:nex_play/core/paged_result/paged.dart';
 import 'package:nex_play/core/utils/logger.dart';
+import 'package:nex_play/features/movie/data/mappers/movie_mapper.dart';
 import 'package:nex_play/features/movie/data/models/movie.dart';
 import 'package:nex_play/features/movie/data/remote/movie_api_service.dart';
 
