@@ -128,12 +128,12 @@ return success(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function()?  error,TResult Function( Movie movie)?  success,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( String error)?  error,TResult Function( Movie movie)?  success,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _MovieDetailedInitial() when initial != null:
 return initial();case _MovieDetailedLoading() when loading != null:
 return loading();case MovieDetailedError() when error != null:
-return error();case MovieDetailedSuccess() when success != null:
+return error(_that.error);case MovieDetailedSuccess() when success != null:
 return success(_that.movie);case _:
   return orElse();
 
@@ -152,12 +152,12 @@ return success(_that.movie);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function()  error,required TResult Function( Movie movie)  success,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( String error)  error,required TResult Function( Movie movie)  success,}) {final _that = this;
 switch (_that) {
 case _MovieDetailedInitial():
 return initial();case _MovieDetailedLoading():
 return loading();case MovieDetailedError():
-return error();case MovieDetailedSuccess():
+return error(_that.error);case MovieDetailedSuccess():
 return success(_that.movie);case _:
   throw StateError('Unexpected subclass');
 
@@ -175,12 +175,12 @@ return success(_that.movie);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function()?  error,TResult? Function( Movie movie)?  success,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( String error)?  error,TResult? Function( Movie movie)?  success,}) {final _that = this;
 switch (_that) {
 case _MovieDetailedInitial() when initial != null:
 return initial();case _MovieDetailedLoading() when loading != null:
 return loading();case MovieDetailedError() when error != null:
-return error();case MovieDetailedSuccess() when success != null:
+return error(_that.error);case MovieDetailedSuccess() when success != null:
 return success(_that.movie);case _:
   return null;
 
@@ -257,33 +257,67 @@ String toString() {
 
 
 class MovieDetailedError implements MovieDetailedState {
-  const MovieDetailedError();
+  const MovieDetailedError({required this.error});
   
 
+ final  String error;
 
-
+/// Create a copy of MovieDetailedState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$MovieDetailedErrorCopyWith<MovieDetailedError> get copyWith => _$MovieDetailedErrorCopyWithImpl<MovieDetailedError>(this, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is MovieDetailedError);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is MovieDetailedError&&(identical(other.error, error) || other.error == error));
 }
 
 
 @override
-int get hashCode => runtimeType.hashCode;
+int get hashCode => Object.hash(runtimeType,error);
 
 @override
 String toString() {
-  return 'MovieDetailedState.error()';
+  return 'MovieDetailedState.error(error: $error)';
 }
 
 
 }
 
+/// @nodoc
+abstract mixin class $MovieDetailedErrorCopyWith<$Res> implements $MovieDetailedStateCopyWith<$Res> {
+  factory $MovieDetailedErrorCopyWith(MovieDetailedError value, $Res Function(MovieDetailedError) _then) = _$MovieDetailedErrorCopyWithImpl;
+@useResult
+$Res call({
+ String error
+});
 
 
+
+
+}
+/// @nodoc
+class _$MovieDetailedErrorCopyWithImpl<$Res>
+    implements $MovieDetailedErrorCopyWith<$Res> {
+  _$MovieDetailedErrorCopyWithImpl(this._self, this._then);
+
+  final MovieDetailedError _self;
+  final $Res Function(MovieDetailedError) _then;
+
+/// Create a copy of MovieDetailedState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? error = null,}) {
+  return _then(MovieDetailedError(
+error: null == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
 
 /// @nodoc
 
