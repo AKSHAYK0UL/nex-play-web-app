@@ -16,6 +16,14 @@ import 'package:nex_play/features/auth/domain/usecases/signin_usecase.dart';
 import 'package:nex_play/features/auth/domain/usecases/signup_usecase.dart';
 import 'package:nex_play/features/auth/domain/usecases/verify_usecase.dart';
 import 'package:nex_play/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:nex_play/features/movie/data/remote/movie_api_service.dart';
+import 'package:nex_play/features/movie/data/remote/movie_remote_datasource.dart';
+import 'package:nex_play/features/movie/data/repositories/movie_repository_impl.dart';
+import 'package:nex_play/features/movie/domain/repositories/movie_repository.dart';
+import 'package:nex_play/features/movie/domain/usecases/movie_detailed_usecase.dart';
+import 'package:nex_play/features/movie/domain/usecases/now_playing_usecase.dart';
+import 'package:nex_play/features/movie/presentation/bloc/movie_detailed_bloc/movie_detailed_bloc.dart';
+import 'package:nex_play/features/movie/presentation/bloc/nowplaying_movies_bloc/bloc/nowplaymovies_bloc.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -93,5 +101,39 @@ Future<void> initDependencies() async {
       resetpasswordUsecase: sl<ResetpasswordUsecase>(),
       logoutUseCase: sl<LogoutUsecase>(),
     ),
+  );
+
+  //---------------------MOvie DI---------------------
+
+  //Movie API service
+  sl.registerLazySingleton<MovieApiService>(() => MovieApiService(sl<Dio>()));
+
+  //MOvie remote data source
+  sl.registerLazySingleton<MovieRemoteDatasource>(
+    () => MovieRemoteDatasourceImpl(sl<MovieApiService>()),
+  );
+
+  //Repository
+  sl.registerLazySingleton<MovieRepository>(
+    () => MovieRepositoryImpl(sl<MovieRemoteDatasource>()),
+  );
+
+  //usecases
+  sl.registerLazySingleton<MovieDetailedUsecase>(
+    () => MovieDetailedUsecase(sl<MovieRepository>()),
+  );
+
+  sl.registerLazySingleton<NowPlayingUsecase>(
+    () => NowPlayingUsecase(sl<MovieRepository>()),
+  );
+
+  //Movie detailed bloc
+  sl.registerLazySingleton<MovieDetailedBloc>(
+    () => MovieDetailedBloc(movieDetailedUsecase: sl<MovieDetailedUsecase>()),
+  );
+
+  //Now playing bloc
+  sl.registerLazySingleton<NowPlayMoviesBloc>(
+    () => NowPlayMoviesBloc(nowPlayingUsecase: sl<NowPlayingUsecase>()),
   );
 }

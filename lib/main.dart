@@ -5,6 +5,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:nex_play/core/di/injection.dart';
 import 'package:nex_play/core/router/app_router.dart';
 import 'package:nex_play/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:nex_play/features/movie/presentation/bloc/movie_detailed_bloc/movie_detailed_bloc.dart';
+import 'package:nex_play/features/movie/presentation/bloc/nowplaying_movies_bloc/bloc/nowplaymovies_bloc.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,9 +34,8 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider<AuthBloc>(create: (_) => sl<AuthBloc>()),
-        // BlocProvider(
-        //   create: (context) => SubjectBloc(),
-        // ),
+        BlocProvider(create: (_) => sl<MovieDetailedBloc>()),
+        BlocProvider(create: (_) => sl<NowPlayMoviesBloc>()),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
