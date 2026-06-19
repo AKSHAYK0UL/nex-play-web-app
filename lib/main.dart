@@ -7,6 +7,7 @@ import 'package:nex_play/core/router/app_router.dart';
 import 'package:nex_play/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:nex_play/features/movie/presentation/bloc/movie_detailed_bloc/movie_detailed_bloc.dart';
 import 'package:nex_play/features/movie/presentation/bloc/nowplaying_movies_bloc/bloc/nowplaymovies_bloc.dart';
+import 'package:nex_play/features/movie/presentation/bloc/nowplaying_movies_bloc/bloc/nowplaymovies_event.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,7 +36,12 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider<AuthBloc>(create: (_) => sl<AuthBloc>()),
         BlocProvider(create: (_) => sl<MovieDetailedBloc>()),
-        BlocProvider(create: (_) => sl<NowPlayMoviesBloc>()),
+        BlocProvider(
+          create: (_) => sl<NowPlayMoviesBloc>()
+            ..add(
+              const NowPlayMoviesEvent.getNowPlaying(lang: 'en-US', page: 1),
+            ),
+        ),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,

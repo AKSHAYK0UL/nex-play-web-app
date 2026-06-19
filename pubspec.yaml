@@ -47,6 +47,7 @@ dependencies:
   equatable: ^2.0.8
   logger: ^2.7.0
   fluttertoast: ^9.0.0
+  carousel_slider: ^5.1.2
 
 dev_dependencies:
   flutter_test:

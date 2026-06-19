@@ -5,17 +5,19 @@ import 'package:nex_play/features/auth/presentation/screens/auth_screen.dart';
 import 'package:nex_play/features/auth/presentation/screens/forgotpassword_screen.dart';
 import 'package:nex_play/features/auth/presentation/screens/landing_screen.dart';
 import 'package:nex_play/features/auth/presentation/screens/verify_screen.dart';
-import 'package:nex_play/features/home/home_screen.dart';
+import 'package:nex_play/features/home/presentation/screens/home_screen.dart';
 
 final appRouter = GoRouter(
-  initialLocation: RoutePath.landingPage,
-  redirect: (context, state) async {
-    final hasTokens = await sl<AuthLocalDatasource>().hasTokens();
-    if (hasTokens && state.matchedLocation == RoutePath.landingPage) {
-      return RoutePath.homeScreen;
-    }
-    return null;
-  },
+  // initialLocation: RoutePath.landingPage,
+    initialLocation: RoutePath.homeScreen,
+
+  // redirect: (context, state) async {
+  //   final hasTokens = await sl<AuthLocalDatasource>().hasTokens();
+  //   if (hasTokens && state.matchedLocation == RoutePath.landingPage) {
+  //     return RoutePath.homeScreen;
+  //   }
+  //   return null;
+  // },
   routes: [
     GoRoute(
       path: RoutePath.landingPage,

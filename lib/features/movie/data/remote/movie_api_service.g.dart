@@ -29,7 +29,7 @@ class _MovieApiService implements MovieApiService {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            'http://localhost:8080/api/v1/movie/details',
+            'http://10.220.211.96:8080/api/v1/movie/details',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -56,7 +56,7 @@ class _MovieApiService implements MovieApiService {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            'http://localhost:8080/api/v1/movie/now_playing',
+            'http://10.220.211.96:8080/api/v1/movie/now_playing',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -94,7 +94,7 @@ class _MovieApiService implements MovieApiService {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            'http://localhost:8080/api/v1/movie/trending',
+            'http://10.220.211.96:8080/api/v1/movie/trending',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -124,7 +124,7 @@ class _MovieApiService implements MovieApiService {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            'http://localhost:8080/api/v1/movie/upcoming',
+            'http://10.220.211.96:8080/api/v1/movie/upcoming',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -154,7 +154,7 @@ class _MovieApiService implements MovieApiService {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            'http://localhost:8080/api/v1/movie/popular',
+            'http://10.220.211.96:8080/api/v1/movie/popular',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -184,7 +184,7 @@ class _MovieApiService implements MovieApiService {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            'http://localhost:8080/api/v1/movie/top_rated',
+            'http://10.220.211.96:8080/api/v1/movie/top_rated',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -218,7 +218,7 @@ class _MovieApiService implements MovieApiService {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            'http://localhost:8080/api/v1/movie/similar',
+            'http://10.220.211.96:8080/api/v1/movie/similar',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -252,7 +252,7 @@ class _MovieApiService implements MovieApiService {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            'http://localhost:8080/api/v1/movie/recommendations',
+            'http://10.220.211.96:8080/api/v1/movie/recommendations',
             queryParameters: queryParameters,
             data: _data,
           )

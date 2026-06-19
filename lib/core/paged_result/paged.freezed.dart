@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Paged<T> {
 
-@JsonKey(name: 'page') int get page;@JsonKey(name: 'results') List<T> get results;@JsonKey(name: 'total_pages') int get totalPage;@JsonKey(name: 'total_results') int get totalResults;
+@JsonKey(name: 'success') bool get success;@JsonKey(name: 'page') int get page;@JsonKey(name: 'results') List<T> get results;@JsonKey(name: 'total_pages') int get totalPages;@JsonKey(name: 'total_results') int get totalResults;
 /// Create a copy of Paged
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $PagedCopyWith<T, Paged<T>> get copyWith => _$PagedCopyWithImpl<T, Paged<T>>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Paged<T>&&(identical(other.page, page) || other.page == page)&&const DeepCollectionEquality().equals(other.results, results)&&(identical(other.totalPage, totalPage) || other.totalPage == totalPage)&&(identical(other.totalResults, totalResults) || other.totalResults == totalResults));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Paged<T>&&(identical(other.success, success) || other.success == success)&&(identical(other.page, page) || other.page == page)&&const DeepCollectionEquality().equals(other.results, results)&&(identical(other.totalPages, totalPages) || other.totalPages == totalPages)&&(identical(other.totalResults, totalResults) || other.totalResults == totalResults));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,page,const DeepCollectionEquality().hash(results),totalPage,totalResults);
+int get hashCode => Object.hash(runtimeType,success,page,const DeepCollectionEquality().hash(results),totalPages,totalResults);
 
 @override
 String toString() {
-  return 'Paged<$T>(page: $page, results: $results, totalPage: $totalPage, totalResults: $totalResults)';
+  return 'Paged<$T>(success: $success, page: $page, results: $results, totalPages: $totalPages, totalResults: $totalResults)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $PagedCopyWith<T,$Res>  {
   factory $PagedCopyWith(Paged<T> value, $Res Function(Paged<T>) _then) = _$PagedCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'page') int page,@JsonKey(name: 'results') List<T> results,@JsonKey(name: 'total_pages') int totalPage,@JsonKey(name: 'total_results') int totalResults
+@JsonKey(name: 'success') bool success,@JsonKey(name: 'page') int page,@JsonKey(name: 'results') List<T> results,@JsonKey(name: 'total_pages') int totalPages,@JsonKey(name: 'total_results') int totalResults
 });
 
 
@@ -65,11 +65,12 @@ class _$PagedCopyWithImpl<T,$Res>
 
 /// Create a copy of Paged
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? page = null,Object? results = null,Object? totalPage = null,Object? totalResults = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? success = null,Object? page = null,Object? results = null,Object? totalPages = null,Object? totalResults = null,}) {
   return _then(_self.copyWith(
-page: null == page ? _self.page : page // ignore: cast_nullable_to_non_nullable
+success: null == success ? _self.success : success // ignore: cast_nullable_to_non_nullable
+as bool,page: null == page ? _self.page : page // ignore: cast_nullable_to_non_nullable
 as int,results: null == results ? _self.results : results // ignore: cast_nullable_to_non_nullable
-as List<T>,totalPage: null == totalPage ? _self.totalPage : totalPage // ignore: cast_nullable_to_non_nullable
+as List<T>,totalPages: null == totalPages ? _self.totalPages : totalPages // ignore: cast_nullable_to_non_nullable
 as int,totalResults: null == totalResults ? _self.totalResults : totalResults // ignore: cast_nullable_to_non_nullable
 as int,
   ));
@@ -156,10 +157,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'page')  int page, @JsonKey(name: 'results')  List<T> results, @JsonKey(name: 'total_pages')  int totalPage, @JsonKey(name: 'total_results')  int totalResults)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'success')  bool success, @JsonKey(name: 'page')  int page, @JsonKey(name: 'results')  List<T> results, @JsonKey(name: 'total_pages')  int totalPages, @JsonKey(name: 'total_results')  int totalResults)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Paged() when $default != null:
-return $default(_that.page,_that.results,_that.totalPage,_that.totalResults);case _:
+return $default(_that.success,_that.page,_that.results,_that.totalPages,_that.totalResults);case _:
   return orElse();
 
 }
@@ -177,10 +178,10 @@ return $default(_that.page,_that.results,_that.totalPage,_that.totalResults);cas
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'page')  int page, @JsonKey(name: 'results')  List<T> results, @JsonKey(name: 'total_pages')  int totalPage, @JsonKey(name: 'total_results')  int totalResults)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'success')  bool success, @JsonKey(name: 'page')  int page, @JsonKey(name: 'results')  List<T> results, @JsonKey(name: 'total_pages')  int totalPages, @JsonKey(name: 'total_results')  int totalResults)  $default,) {final _that = this;
 switch (_that) {
 case _Paged():
-return $default(_that.page,_that.results,_that.totalPage,_that.totalResults);case _:
+return $default(_that.success,_that.page,_that.results,_that.totalPages,_that.totalResults);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -197,10 +198,10 @@ return $default(_that.page,_that.results,_that.totalPage,_that.totalResults);cas
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'page')  int page, @JsonKey(name: 'results')  List<T> results, @JsonKey(name: 'total_pages')  int totalPage, @JsonKey(name: 'total_results')  int totalResults)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'success')  bool success, @JsonKey(name: 'page')  int page, @JsonKey(name: 'results')  List<T> results, @JsonKey(name: 'total_pages')  int totalPages, @JsonKey(name: 'total_results')  int totalResults)?  $default,) {final _that = this;
 switch (_that) {
 case _Paged() when $default != null:
-return $default(_that.page,_that.results,_that.totalPage,_that.totalResults);case _:
+return $default(_that.success,_that.page,_that.results,_that.totalPages,_that.totalResults);case _:
   return null;
 
 }
@@ -212,9 +213,10 @@ return $default(_that.page,_that.results,_that.totalPage,_that.totalResults);cas
 @JsonSerializable(genericArgumentFactories: true)
 
 class _Paged<T> implements Paged<T> {
-  const _Paged({@JsonKey(name: 'page') this.page = 0, @JsonKey(name: 'results') required final  List<T> results, @JsonKey(name: 'total_pages') this.totalPage = 0, @JsonKey(name: 'total_results') this.totalResults = 0}): _results = results;
+  const _Paged({@JsonKey(name: 'success') this.success = false, @JsonKey(name: 'page') this.page = 0, @JsonKey(name: 'results') required final  List<T> results, @JsonKey(name: 'total_pages') this.totalPages = 0, @JsonKey(name: 'total_results') this.totalResults = 0}): _results = results;
   factory _Paged.fromJson(Map<String, dynamic> json,T Function(Object?) fromJsonT) => _$PagedFromJson(json,fromJsonT);
 
+@override@JsonKey(name: 'success') final  bool success;
 @override@JsonKey(name: 'page') final  int page;
  final  List<T> _results;
 @override@JsonKey(name: 'results') List<T> get results {
@@ -223,7 +225,7 @@ class _Paged<T> implements Paged<T> {
   return EqualUnmodifiableListView(_results);
 }
 
-@override@JsonKey(name: 'total_pages') final  int totalPage;
+@override@JsonKey(name: 'total_pages') final  int totalPages;
 @override@JsonKey(name: 'total_results') final  int totalResults;
 
 /// Create a copy of Paged
@@ -239,16 +241,16 @@ Map<String, dynamic> toJson(Object? Function(T) toJsonT) {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Paged<T>&&(identical(other.page, page) || other.page == page)&&const DeepCollectionEquality().equals(other._results, _results)&&(identical(other.totalPage, totalPage) || other.totalPage == totalPage)&&(identical(other.totalResults, totalResults) || other.totalResults == totalResults));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Paged<T>&&(identical(other.success, success) || other.success == success)&&(identical(other.page, page) || other.page == page)&&const DeepCollectionEquality().equals(other._results, _results)&&(identical(other.totalPages, totalPages) || other.totalPages == totalPages)&&(identical(other.totalResults, totalResults) || other.totalResults == totalResults));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,page,const DeepCollectionEquality().hash(_results),totalPage,totalResults);
+int get hashCode => Object.hash(runtimeType,success,page,const DeepCollectionEquality().hash(_results),totalPages,totalResults);
 
 @override
 String toString() {
-  return 'Paged<$T>(page: $page, results: $results, totalPage: $totalPage, totalResults: $totalResults)';
+  return 'Paged<$T>(success: $success, page: $page, results: $results, totalPages: $totalPages, totalResults: $totalResults)';
 }
 
 
@@ -259,7 +261,7 @@ abstract mixin class _$PagedCopyWith<T,$Res> implements $PagedCopyWith<T, $Res> 
   factory _$PagedCopyWith(_Paged<T> value, $Res Function(_Paged<T>) _then) = __$PagedCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'page') int page,@JsonKey(name: 'results') List<T> results,@JsonKey(name: 'total_pages') int totalPage,@JsonKey(name: 'total_results') int totalResults
+@JsonKey(name: 'success') bool success,@JsonKey(name: 'page') int page,@JsonKey(name: 'results') List<T> results,@JsonKey(name: 'total_pages') int totalPages,@JsonKey(name: 'total_results') int totalResults
 });
 
 
@@ -276,11 +278,12 @@ class __$PagedCopyWithImpl<T,$Res>
 
 /// Create a copy of Paged
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? page = null,Object? results = null,Object? totalPage = null,Object? totalResults = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? success = null,Object? page = null,Object? results = null,Object? totalPages = null,Object? totalResults = null,}) {
   return _then(_Paged<T>(
-page: null == page ? _self.page : page // ignore: cast_nullable_to_non_nullable
+success: null == success ? _self.success : success // ignore: cast_nullable_to_non_nullable
+as bool,page: null == page ? _self.page : page // ignore: cast_nullable_to_non_nullable
 as int,results: null == results ? _self._results : results // ignore: cast_nullable_to_non_nullable
-as List<T>,totalPage: null == totalPage ? _self.totalPage : totalPage // ignore: cast_nullable_to_non_nullable
+as List<T>,totalPages: null == totalPages ? _self.totalPages : totalPages // ignore: cast_nullable_to_non_nullable
 as int,totalResults: null == totalResults ? _self.totalResults : totalResults // ignore: cast_nullable_to_non_nullable
 as int,
   ));
