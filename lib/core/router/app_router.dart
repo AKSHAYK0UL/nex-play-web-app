@@ -6,10 +6,13 @@ import 'package:nex_play/features/auth/presentation/screens/forgotpassword_scree
 import 'package:nex_play/features/auth/presentation/screens/landing_screen.dart';
 import 'package:nex_play/features/auth/presentation/screens/verify_screen.dart';
 import 'package:nex_play/features/home/presentation/screens/home_screen.dart';
+import 'package:nex_play/features/movie/domain/entities/movie.dart';
+import 'package:nex_play/features/movie/presentation/screens/movie_details_screen.dart';
+import 'package:nex_play/features/shared/stream/stream_screen.dart';
 
 final appRouter = GoRouter(
   // initialLocation: RoutePath.landingPage,
-    initialLocation: RoutePath.homeScreen,
+  initialLocation: RoutePath.homeScreen,
 
   // redirect: (context, state) async {
   //   final hasTokens = await sl<AuthLocalDatasource>().hasTokens();
@@ -49,6 +52,23 @@ final appRouter = GoRouter(
       name: RouteName.homeScreen,
       builder: (context, state) => const HomeScreen(),
     ),
+    GoRoute(
+      path: RoutePath.movieDetailsScreen,
+      name: RouteName.movieDetailsScreen,
+      builder: (context, state) {
+        final movie = state.extra as Movie;
+        return MovieDetailScreen(movie: movie);
+      },
+    ),
+     GoRoute(
+      path: RoutePath.streamScreen,
+      name: RouteName.streamScreen,
+      builder: (context, state) {
+        final streamUrl = state.extra as String;
+        print("######### STREAM URL ${streamUrl} #########");
+        return StreamScreen(streamUrl: streamUrl,);
+      },
+    ),
   ],
 );
 
@@ -59,6 +79,9 @@ class RoutePath {
   static const String verifyScreen = "/verify_screen";
   static const String forgotPassword = "/forgot_password";
   static const String homeScreen = "/home_screen";
+  static const String movieDetailsScreen = "/movie_details_screen";
+    static const String streamScreen = "/stream_screen";
+
 }
 
 //name class "name"
@@ -68,4 +91,7 @@ class RouteName {
   static const String verifyScreen = "verify_screen";
   static const String forgotPassword = "forgot_password";
   static const String homeScreen = "home_screen";
+  static const String movieDetailsScreen = "movie_details_screen";
+      static const String streamScreen = "stream_screen";
+
 }

@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:nex_play/core/constants/api_const.dart';
 import 'package:nex_play/core/enums/time_window.dart';
+import 'package:nex_play/core/models/api_response.dart';
 import 'package:nex_play/core/paged_result/paged.dart';
 import 'package:nex_play/features/movie/data/models/movie.dart';
 import 'package:retrofit/retrofit.dart';
@@ -12,7 +13,7 @@ abstract class MovieApiService {
   factory MovieApiService(Dio dio, {String? baseUrl}) = _MovieApiService;
 
   @GET(MovieApi.movieDetails)
-  Future<Movie> getMovieDetails(
+  Future<ApiResponse<Movie>> getMovieDetails(
     @Query('id') int id,
     @Query('lang') String lang,
   );

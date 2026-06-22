@@ -48,8 +48,8 @@ class MovieRemoteDatasourceImpl implements MovieRemoteDatasource {
 
       final response = await _movieApiService.getMovieDetails(id, lang);
 
-      AppLogger.info("Movie response ${response.title}");
-      return response;
+      AppLogger.info("Movie response ${response.data.title}");
+      return response.data;
     } on DioException catch (e) {
       AppLogger.error("Failed to Fetch MovieDetails: $id");
       _handleDioError(e);
