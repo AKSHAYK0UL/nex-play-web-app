@@ -24,11 +24,11 @@ Future<void> main() async {
 
   await initDependencies();
 
-  runApp(const MyApp());
+  runApp(const NexPlay());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class NexPlay extends StatelessWidget {
+  const NexPlay({super.key});
 
   @override
   Widget build(BuildContext context) {
