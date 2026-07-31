@@ -18,6 +18,7 @@ class ApiConst {
 class MovieApi {
   static const String baseUrl = 'http://localhost:8080/api/v1';
 
+
   static const String movieDetails = '$baseUrl/movie/details';
   static const String nowPlaying = '$baseUrl/movie/now_playing';
   static const String trending = '$baseUrl/movie/trending';

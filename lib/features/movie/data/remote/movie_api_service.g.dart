@@ -80,11 +80,7 @@ class _MovieApiService implements MovieApiService {
   }
 
   @override
-  Future<Paged<Movie>> getTrending(
-    String lang,
-    TimeWindow time,
-    int page,
-  ) async {
+  Future<Paged<Movie>> getTrending(String lang, String time, int page) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
       r'lang': lang,

@@ -65,7 +65,7 @@ final appRouter = GoRouter(
       name: RouteName.streamScreen,
       builder: (context, state) {
         final streamUrl = state.extra as String;
-        print("######### STREAM URL ${streamUrl} #########");
+        
         return StreamScreen(streamUrl: streamUrl,);
       },
     ),

@@ -165,7 +165,7 @@ class MovieRemoteDatasourceImpl implements MovieRemoteDatasource {
     try {
       AppLogger.info("Attempting Fetch getTrending");
 
-      final response = await _movieApiService.getTrending(lang, time, page);
+      final response = await _movieApiService.getTrending(lang, time == TimeWindow.day?'day':'week', page);
 
       AppLogger.info("Trending movies response ${response.totalResults}");
       return response;

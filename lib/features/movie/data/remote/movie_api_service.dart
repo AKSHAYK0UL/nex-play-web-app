@@ -27,7 +27,7 @@ abstract class MovieApiService {
   @GET(MovieApi.trending)
   Future<Paged<Movie>> getTrending(
     @Query('lang') String lang,
-    @Query('time') TimeWindow time,
+    @Query('time') String time,
     @Query('page') int page,
   );
 

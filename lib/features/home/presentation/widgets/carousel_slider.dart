@@ -1,3 +1,4 @@
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -271,16 +272,118 @@ class _PillIndicator extends StatelessWidget {
   }
 }
 
+//  Loading state: shimmer skeleton 
+
+
 class _CarouselLoading extends StatelessWidget {
   const _CarouselLoading();
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final cardHeight = size.height * 0.6;
+    final cardWidth = size.width * 0.78;
+
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.6,
-      child: const Center(
-        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white54),
+      height: cardHeight,
+      child: _Shimmer(
+        child: Center(
+          child: _ShimmerBox(
+            width: cardWidth,
+            height: cardHeight,
+            borderRadius: 22,
+          ),
+        ),
       ),
+    );
+  }
+}
+
+// Solid placeholder block. 
+class _ShimmerBox extends StatelessWidget {
+  final double? width;
+  final double? height;
+  final double borderRadius;
+
+  const _ShimmerBox({this.width, this.height, this.borderRadius = 8});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: const Color(0xFF2C2C2E),
+        borderRadius: BorderRadius.circular(borderRadius),
+      ),
+    );
+  }
+}
+
+// Sweeps a soft highlight band left-to-right, on loop,
+// dependency needed).
+class _Shimmer extends StatefulWidget {
+  final Widget child;
+  const _Shimmer({required this.child});
+
+  @override
+  State<_Shimmer> createState() => _ShimmerState();
+}
+
+class _ShimmerState extends State<_Shimmer>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+
+  static const _baseColor = Color(0xFF232325);
+  static const _highlightColor = Color(0xFF3A3A3D);
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1400),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return ShaderMask(
+          blendMode: BlendMode.srcATop,
+          shaderCallback: (bounds) => LinearGradient(
+            colors: const [_baseColor, _highlightColor, _baseColor],
+            stops: const [0.35, 0.5, 0.65],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            transform: _SlidingGradientTransform(_controller.value),
+          ).createShader(bounds),
+          child: child,
+        );
+      },
+      child: widget.child,
+    );
+  }
+}
+
+class _SlidingGradientTransform extends GradientTransform {
+  final double slidePercent;
+  const _SlidingGradientTransform(this.slidePercent);
+
+  @override
+  Matrix4? transform(Rect bounds, {TextDirection? textDirection}) {
+    return Matrix4.translationValues(
+      bounds.width * (slidePercent * 3 - 1.5),
+      0.0,
+      0.0,
     );
   }
 }
