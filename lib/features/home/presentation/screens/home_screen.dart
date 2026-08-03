@@ -8,11 +8,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: SafeArea(
-        bottom: false,
-        child: CustomScrollView(
+    return  CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
             SliverToBoxAdapter(
@@ -54,8 +50,8 @@ class HomeScreen extends StatelessWidget {
               child: SizedBox(height: 32),
             ),
           ],
-        ),
-      ),
+        
+
     );
   }
 }

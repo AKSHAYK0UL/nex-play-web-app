@@ -6,11 +6,11 @@ import 'package:nex_play/core/di/injection.dart';
 import 'package:nex_play/core/enums/time_window.dart';
 import 'package:nex_play/core/router/app_router.dart';
 import 'package:nex_play/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:nex_play/features/movie/presentation/bloc/movie_detailed_bloc/movie_detailed_bloc.dart';
-import 'package:nex_play/features/movie/presentation/bloc/nowplaying_movies_bloc/bloc/nowplaymovies_bloc.dart';
-import 'package:nex_play/features/movie/presentation/bloc/nowplaying_movies_bloc/bloc/nowplaymovies_event.dart';
-import 'package:nex_play/features/movie/presentation/bloc/trending_movies_bloc/bloc/trending_movies_bloc.dart';
-import 'package:nex_play/features/movie/presentation/bloc/trending_movies_bloc/bloc/trending_movies_event.dart';
+import 'package:nex_play/features/shared/movie/presentation/bloc/movie_detailed_bloc/movie_detailed_bloc.dart';
+import 'package:nex_play/features/shared/movie/presentation/bloc/nowplaying_movies_bloc/bloc/nowplaymovies_bloc.dart';
+import 'package:nex_play/features/shared/movie/presentation/bloc/nowplaying_movies_bloc/bloc/nowplaymovies_event.dart';
+import 'package:nex_play/features/shared/movie/presentation/bloc/trending_movies_bloc/bloc/trending_movies_bloc.dart';
+import 'package:nex_play/features/shared/movie/presentation/bloc/trending_movies_bloc/bloc/trending_movies_event.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

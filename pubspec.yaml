@@ -49,6 +49,8 @@ dependencies:
   fluttertoast: ^9.0.0
   carousel_slider: ^5.1.2
   flutter_inappwebview: ^6.1.5
+  google_nav_bar: ^5.0.7
+  font_awesome_flutter: ^11.0.0
 
 dev_dependencies:
   flutter_test:
