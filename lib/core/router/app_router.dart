@@ -12,17 +12,17 @@ import 'package:nex_play/features/shared/movie/presentation/screens/movie_detail
 import 'package:nex_play/features/shared/stream/stream_screen.dart';
 
 final appRouter = GoRouter(
-  // initialLocation: RoutePath.landingPage,
+  initialLocation: RoutePath.landingPage,
   // initialLocation: RoutePath.homeScreen,
-  initialLocation: RoutePath.bottomNavbar,
+  // initialLocation: RoutePath.bottomNavbar,
 
-  // redirect: (context, state) async {
-  //   final hasTokens = await sl<AuthLocalDatasource>().hasTokens();
-  //   if (hasTokens && state.matchedLocation == RoutePath.landingPage) {
-  //     return RoutePath.homeScreen;
-  //   }
-  //   return null;
-  // },
+  redirect: (context, state) async {
+    final hasTokens = await sl<AuthLocalDatasource>().hasTokens();
+    if (hasTokens && state.matchedLocation == RoutePath.landingPage) {
+      return RoutePath.homeScreen;
+    }
+    return null;
+  },
   routes: [
     GoRoute(
       path: RoutePath.landingPage,

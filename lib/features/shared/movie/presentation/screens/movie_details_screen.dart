@@ -8,6 +8,10 @@ import 'package:nex_play/features/shared/movie/domain/entities/movie.dart';
 import 'package:nex_play/features/shared/movie/presentation/bloc/movie_detailed_bloc/movie_detailed_bloc.dart';
 import 'package:nex_play/features/shared/movie/presentation/bloc/movie_detailed_bloc/movie_detailed_event.dart';
 import 'package:nex_play/features/shared/movie/presentation/bloc/movie_detailed_bloc/movie_detailed_state.dart';
+import 'package:nex_play/features/shared/movie/presentation/bloc/movies_recommendations_bloc/movies_recommendations_bloc.dart';
+import 'package:nex_play/features/shared/movie/presentation/bloc/movies_recommendations_bloc/movies_recommendations_event.dart';
+import 'package:nex_play/features/shared/movie/presentation/bloc/movies_recommendations_bloc/movies_recommendations_state.dart';
+import 'package:nex_play/features/shared/widgets/horzontial_movie_list.dart';
 
 class MovieDetailScreen extends StatefulWidget {
   final Movie movie;
@@ -29,6 +33,14 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
   void _fetchDetails() {
     context.read<MovieDetailedBloc>().add(
       MovieDetailedEvent.getMovieDetails(id: widget.movie.id, lang: 'en-US'),
+    );
+
+    context.read<MovieRecommendationsBloc>().add(
+      MovieRecommendationsEvent.getMoviesRecommendations(
+        id: widget.movie.id,
+        lang: 'en-US',
+        page: 1,
+      ),
     );
   }
 
@@ -111,6 +123,11 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                           const SizedBox(height: 30),
                         ],
                         _InfoGrid(movie: movie),
+                        const SizedBox(height: 30),
+
+                        //recommendation section
+                        _RecommendationsSection(),
+                        //similar section
                       ],
                     ],
                   ),
@@ -151,7 +168,7 @@ class _Backdrop extends StatelessWidget {
               end: Alignment.bottomCenter,
               stops: const [0.0, 0.5, 1.0],
               colors: [
-                Colors.black.withValues(alpha:0.45),
+                Colors.black.withValues(alpha: 0.45),
                 Colors.transparent,
                 Colors.black,
               ],
@@ -175,7 +192,7 @@ class _GlassIconButton extends StatelessWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
         child: Material(
-          color: Colors.white.withValues(alpha:0.14),
+          color: Colors.white.withValues(alpha: 0.14),
           shape: const CircleBorder(),
           child: InkWell(
             customBorder: const CircleBorder(),
@@ -209,7 +226,7 @@ class _TitleRow extends StatelessWidget {
               borderRadius: BorderRadius.circular(14),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha:0.4),
+                  color: Colors.black.withValues(alpha: 0.4),
                   blurRadius: 18,
                   offset: const Offset(0, 8),
                 ),
@@ -250,7 +267,7 @@ class _TitleRow extends StatelessWidget {
                 Text(
                   movie.tagline!,
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha:0.5),
+                    color: Colors.white.withValues(alpha: 0.5),
                     fontSize: 13,
                     fontStyle: FontStyle.italic,
                   ),
@@ -311,7 +328,7 @@ class _MetaText extends StatelessWidget {
     return Text(
       text,
       style: TextStyle(
-        color: Colors.white.withValues(alpha:0.6),
+        color: Colors.white.withValues(alpha: 0.6),
         fontSize: 13,
         fontWeight: FontWeight.w500,
       ),
@@ -338,7 +355,7 @@ class _ActionRow extends StatelessWidget {
                 RouteName.streamScreen,
                 extra: movie.streamUrl,
               ),
-              splashColor: Colors.white.withValues(alpha:0.15),
+              splashColor: Colors.white.withValues(alpha: 0.15),
               child: const Padding(
                 padding: EdgeInsets.symmetric(vertical: 14),
                 child: Row(
@@ -382,7 +399,7 @@ class _CircleAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white.withValues(alpha:0.1),
+      color: Colors.white.withValues(alpha: 0.1),
       shape: const CircleBorder(),
       child: InkWell(
         customBorder: const CircleBorder(),
@@ -410,13 +427,13 @@ class _GenreChips extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white.withValues(alpha:0.18)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
           ),
 
           child: Text(
             g.name,
             style: TextStyle(
-              color: Colors.white.withValues(alpha:0.75),
+              color: Colors.white.withValues(alpha: 0.75),
               fontSize: 12.5,
               fontWeight: FontWeight.w500,
             ),
@@ -453,7 +470,7 @@ class _InfoGrid extends StatelessWidget {
         Text(
           'Info',
           style: TextStyle(
-            color: Colors.white.withValues(alpha:0.85),
+            color: Colors.white.withValues(alpha: 0.85),
             fontSize: 15,
             fontWeight: FontWeight.w600,
             letterSpacing: -0.2,
@@ -472,7 +489,7 @@ class _InfoGrid extends StatelessWidget {
                   Text(
                     e.key,
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha:0.4),
+                      color: Colors.white.withValues(alpha: 0.4),
                       fontSize: 12,
                     ),
                   ),
@@ -616,14 +633,14 @@ class _DetailErrorSection extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 16),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha:0.06),
+        color: Colors.white.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         children: [
           Icon(
             Icons.error_outline_rounded,
-            color: Colors.white.withValues(alpha:0.6),
+            color: Colors.white.withValues(alpha: 0.6),
             size: 28,
           ),
           const SizedBox(height: 10),
@@ -631,7 +648,7 @@ class _DetailErrorSection extends StatelessWidget {
             message,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: Colors.white.withValues(alpha:0.7),
+              color: Colors.white.withValues(alpha: 0.7),
               fontSize: 13.5,
               height: 1.4,
             ),
@@ -649,6 +666,30 @@ class _DetailErrorSection extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+//recommendation section
+class _RecommendationsSection extends StatelessWidget {
+  const _RecommendationsSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<MovieRecommendationsBloc, MovieRecommendationsState>(
+      buildWhen: (previous, current) => current != previous,
+      builder: (context, state) {
+        return state.when(
+          initial: () => const SizedBox.shrink(),
+          loading: () => HorzontialMovieListLoading(),
+          error: (err) => HorzontialMovieListError(message: err),
+          success: (movies) {
+            final list = movies.results.take(10).toList();
+            if (list.isEmpty) return const SizedBox.shrink();
+            return HorzontialMovieListContent(title:"You Might Like",movies: list, navTo: () {});
+          },
+        );
+      },
     );
   }
 }

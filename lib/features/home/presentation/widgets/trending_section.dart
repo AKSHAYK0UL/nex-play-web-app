@@ -20,7 +20,7 @@ class BuildTrendingList extends StatelessWidget {
           success: (movies) {
             final list = movies.results.take(10).toList();
             if (list.isEmpty) return const SizedBox.shrink();
-            return HorzontialMovieListContent(movies: list, navTo: () {});
+            return HorzontialMovieListContent(title:"Trending Now",movies: list, navTo: () {});
           },
         );
       },

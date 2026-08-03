@@ -22,8 +22,10 @@ import 'package:nex_play/features/shared/movie/data/repositories/movie_repositor
 import 'package:nex_play/features/shared/movie/domain/repositories/movie_repository.dart';
 import 'package:nex_play/features/shared/movie/domain/usecases/movie_detailed_usecase.dart';
 import 'package:nex_play/features/shared/movie/domain/usecases/now_playing_usecase.dart';
+import 'package:nex_play/features/shared/movie/domain/usecases/recommendations_usecase.dart';
 import 'package:nex_play/features/shared/movie/domain/usecases/trending_usecase.dart';
 import 'package:nex_play/features/shared/movie/presentation/bloc/movie_detailed_bloc/movie_detailed_bloc.dart';
+import 'package:nex_play/features/shared/movie/presentation/bloc/movies_recommendations_bloc/movies_recommendations_bloc.dart';
 import 'package:nex_play/features/shared/movie/presentation/bloc/nowplaying_movies_bloc/bloc/nowplaymovies_bloc.dart';
 import 'package:nex_play/features/shared/movie/presentation/bloc/trending_movies_bloc/bloc/trending_movies_bloc.dart';
 
@@ -133,6 +135,10 @@ Future<void> initDependencies() async {
     () => TrendingUsecase(sl<MovieRepository>()),
   );
 
+  sl.registerLazySingleton<RecommendationsUsecase>(
+    () => RecommendationsUsecase(sl<MovieRepository>()),
+  );
+
   //Movie detailed bloc
   sl.registerLazySingleton<MovieDetailedBloc>(
     () => MovieDetailedBloc(movieDetailedUsecase: sl<MovieDetailedUsecase>()),
@@ -146,5 +152,12 @@ Future<void> initDependencies() async {
   //trending movies bloc
   sl.registerLazySingleton<TrendingMoviesBloc>(
     () => TrendingMoviesBloc(trendingUsecase: sl<TrendingUsecase>()),
+  );
+
+  //recommendation movies bloc
+  sl.registerLazySingleton<MovieRecommendationsBloc>(
+    () => MovieRecommendationsBloc(
+      recommendationsUsecase: sl<RecommendationsUsecase>(),
+    ),
   );
 }

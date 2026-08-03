@@ -5,17 +5,19 @@ import 'package:nex_play/features/shared/movie/domain/entities/movie.dart';
 
 //content
 class HorzontialMovieListContent extends StatelessWidget {
+  final String title;
   final List<Movie> movies;
   final VoidCallback navTo;
   const HorzontialMovieListContent({
     super.key,
+    required this.title,
     required this.movies,
     required this.navTo,
   });
 
   @override
   Widget build(BuildContext context) {
-    return _movieContent(movies: movies, onTap: navTo);
+    return _movieContent(title: title, movies: movies, onTap: navTo);
   }
 }
 
@@ -44,6 +46,7 @@ class HorzontialMovieListError extends StatelessWidget {
 
 //content
 Widget _movieContent({
+  required String title,
   required List<Movie> movies,
   required VoidCallback onTap,
 }) {
@@ -56,8 +59,8 @@ Widget _movieContent({
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'Trending Now',
+            Text(
+              title,
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 20,
