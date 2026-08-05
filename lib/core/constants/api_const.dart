@@ -1,6 +1,9 @@
-class ApiConst {
+import 'package:nex_play/core/config/secrets.dart';
+
+class AuthAPI {
+    // static const String baseUrl = 'http://localhost:8080/api/v1';
+  static const String baseUrl = authBaseURL;
   //Timeout durations in seconds for network requests.
-  static const String baseUrl = 'http://localhost:8080/api/v1';
   static const int connectTimeout = 30;
   static const int receiveTimeout = 30;
   static const int otpCodeLenght = 6;
@@ -14,9 +17,11 @@ class ApiConst {
   static const String resetPassword = '$baseUrl/auth/password/reset';
 }
 
-// Movie endpoints
-class MovieApi {
-  static const String baseUrl = 'http://localhost:8080/api/v1';
+// media endpoints
+class MediaAPI {
+  // static const String baseUrl = 'http://localhost:8080/api/v1';
+    static const String baseUrl = mediaBaseURL;
+
 
 
   static const String movieDetails = '$baseUrl/movie/details';

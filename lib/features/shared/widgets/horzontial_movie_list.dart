@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nex_play/core/router/app_router.dart';
+import 'package:nex_play/core/widgets/image.dart';
 import 'package:nex_play/features/shared/movie/domain/entities/movie.dart';
 
 //content
@@ -121,35 +122,12 @@ Widget _movieCard({required BuildContext context, required Movie movie}) {
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
-                      Hero(
-                        tag: 'trending-poster-${movie.id}',
-                        child: Image.network(
-                          "https://image.tmdb.org/t/p/w342${movie.posterPath}",
-                          fit: BoxFit.cover,
-                          loadingBuilder: (context, child, progress) {
-                            if (progress == null) return child;
-                            return Container(
-                              color: const Color(0xFF1C1C1E),
-                              child: const Center(
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white54,
-                                ),
-                              ),
-                            );
-                          },
-                          errorBuilder: (_, __, ___) => Container(
-                            color: const Color(0xFF1C1C1E),
-                            child: const Center(
-                              child: Icon(
-                                Icons.broken_image_outlined,
-                                color: Colors.white30,
-                                size: 28,
-                              ),
-                            ),
-                          ),
-                        ),
+                      AppImage(
+                        path: movie.posterPath!,
+                        size: 'w342',
+                        fit: BoxFit.cover,
                       ),
+
                       if (movie.voteAverage != null && movie.voteAverage! > 0)
                         Positioned(
                           top: 8,

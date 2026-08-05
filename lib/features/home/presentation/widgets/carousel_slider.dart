@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nex_play/core/router/app_router.dart';
+import 'package:nex_play/core/widgets/image.dart';
 import 'package:nex_play/features/shared/movie/domain/entities/movie.dart';
 import 'package:nex_play/features/shared/movie/presentation/bloc/nowplaying_movies_bloc/bloc/nowplaymovies_bloc.dart';
 import 'package:nex_play/features/shared/movie/presentation/bloc/nowplaying_movies_bloc/bloc/nowplaymovies_state.dart';
@@ -112,35 +113,7 @@ Widget _carouselCard({required BuildContext context, required Movie movie}) {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Hero(
-              tag: 'movie-poster-${movie.id}',
-              child: Image.network(
-                "https://image.tmdb.org/t/p/w780${movie.posterPath}",
-                fit: BoxFit.fill,
-                loadingBuilder: (context, child, progress) {
-                  if (progress == null) return child;
-                  return Container(
-                    color: const Color(0xFF1C1C1E),
-                    child: const Center(
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white54,
-                      ),
-                    ),
-                  );
-                },
-                errorBuilder: (_, __, ___) => Container(
-                  color: const Color(0xFF1C1C1E),
-                  child: const Center(
-                    child: Icon(
-                      Icons.broken_image_outlined,
-                      color: Colors.white30,
-                      size: 36,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            AppImage(path: movie.posterPath!, size: 'w780', fit: BoxFit.fill),
 
             Positioned.fill(
               child: DecoratedBox(

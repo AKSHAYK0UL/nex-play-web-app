@@ -29,12 +29,12 @@ class _VerifyScreenState extends State<VerifyScreen>
     with TickerProviderStateMixin {
   //OTP textfeilds
   final List<TextEditingController> _controllers = List.generate(
-    ApiConst.otpCodeLenght,
+    AuthAPI.otpCodeLenght,
     (_) => TextEditingController(),
   );
 
   final List<FocusNode> _focusNodes = List.generate(
-    ApiConst.otpCodeLenght,
+    AuthAPI.otpCodeLenght,
     (_) => FocusNode(),
   );
 
@@ -139,16 +139,16 @@ class _VerifyScreenState extends State<VerifyScreen>
     }
 
     // Paste: fill all boxes at once
-    if (clean.length == ApiConst.otpCodeLenght) {
-      for (int i = 0; i < ApiConst.otpCodeLenght; i++) {
+    if (clean.length == AuthAPI.otpCodeLenght) {
+      for (int i = 0; i < AuthAPI.otpCodeLenght; i++) {
         _controllers[i].text = clean[i];
       }
-      _focusNodes[ApiConst.otpCodeLenght - 1].requestFocus();
+      _focusNodes[AuthAPI.otpCodeLenght - 1].requestFocus();
       _maybeAutoSubmit();
       return;
     }
     _controllers[index].text = clean[clean.length - 1];
-    if (index < ApiConst.otpCodeLenght - 1) {
+    if (index < AuthAPI.otpCodeLenght - 1) {
       _focusNodes[index + 1].requestFocus();
     } else {
       _focusNodes[index].unfocus();
@@ -180,7 +180,7 @@ class _VerifyScreenState extends State<VerifyScreen>
   //verify
   void _submitOTP() {
     final otpCode = _controllers.map((c) => c.text).join();
-    if (otpCode.length < ApiConst.otpCodeLenght) {
+    if (otpCode.length < AuthAPI.otpCodeLenght) {
       setState(() {
         _hasError = true;
         _errorMessage = "incomplete OTP";
@@ -237,7 +237,7 @@ class _VerifyScreenState extends State<VerifyScreen>
       listenWhen: (prev, curr) => prev != curr,
       listener: (context, state) {
         state.maybeWhen(
-          success: () => context.go(RoutePath.homeScreen),
+          success: () => context.go(RoutePath.bottomNavbar),
           error: (error) {
             setState(() {
               _hasError = true;

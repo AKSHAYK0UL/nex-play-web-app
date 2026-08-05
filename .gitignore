@@ -44,4 +44,5 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 .dart_tool/*
-.idea/* 
+.idea/*
+lib/core/config/secrets.dart 

@@ -24,7 +24,7 @@ Widget otpBoxes({
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: List.generate(
-        ApiConst.otpCodeLenght,
+        AuthAPI.otpCodeLenght,
         (i) => _OtpBox(
           controller: controllers[i],
           focusNode: focusNodes[i],

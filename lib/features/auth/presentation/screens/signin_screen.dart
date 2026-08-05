@@ -74,7 +74,7 @@ class _SigninScreenState extends State<SigninScreen>
 
       listener: (context, state) {
         state.maybeWhen(
-          success: () => context.go(RoutePath.homeScreen),
+          success: () => context.go(RoutePath.bottomNavbar),
           error: (error) {
             showSnack(context, error);
           },

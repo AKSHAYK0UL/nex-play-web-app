@@ -1,10 +1,10 @@
-
 import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nex_play/core/config/secrets.dart';
 
 class StreamScreen extends StatefulWidget {
   final String streamUrl;
@@ -28,20 +28,6 @@ class _StreamScreenState extends State<StreamScreen> {
   bool _canDetectState = false;
   Timer? _stateWatchdog;
 
-  static const _allowedHosts = [
-    'vidsrc.icu',
-    'vidsrc.me',
-    'vidsrc.net',
-    'streamimdb.ru',
-    'streamimdb.net',
-    'streamimdb.me',
-    'streamimdb.icu',
-    'streamimdb',
-    'vidsrcme.su',
-    'vidsrc-embed.ru',
-    'vsembed.ru',
-  ];
-
   final _webViewSettings = InAppWebViewSettings(
     javaScriptEnabled: true,
     mediaPlaybackRequiresUserGesture: false,
@@ -49,7 +35,8 @@ class _StreamScreenState extends State<StreamScreen> {
     transparentBackground: true,
     useShouldOverrideUrlLoading: true,
     disableContextMenu: true,
-    supportMultipleWindows: false,
+    // Must be true so onCreateWindow fires and we can block iframe popups.
+    supportMultipleWindows: true,
   );
 
   @override
@@ -82,13 +69,13 @@ class _StreamScreenState extends State<StreamScreen> {
     if (url == null) return false;
     final uri = Uri.tryParse(url);
     if (uri == null) return false;
-    return _allowedHosts.any(
+    // kAllowedHosts comes from lib/core/config/secrets.dart (gitignored)
+    return kAllowedHosts.any(
       (host) => uri.host == host || uri.host.endsWith('.$host'),
     );
   }
 
   void _handleScreenTap() {
-   
     if (_canDetectState && !_isVideoPlaying) {
       _hideTimer?.cancel();
       setState(() => _isControlVisible = true);
@@ -109,13 +96,17 @@ class _StreamScreenState extends State<StreamScreen> {
     }
   }
 
-  // JS that hides player UI elements and monitors video state
+  // Builds the JS allowed-hosts array from kAllowedHosts at runtime,
+  // so the list is never duplicated anywhere in the source.
+  String get _allowedHostsJs =>
+      '[${kAllowedHosts.map((h) => "'$h'").join(', ')}]';
+
   String get _injectScript => """
   (function() {
     if (window.__vsInjected) return;
     window.__vsInjected = true;
 
-    // 1) Inject CSS rules
+    //  1) Base CSS 
     var style = document.createElement('style');
     style.textContent = [
       '* {',
@@ -126,63 +117,53 @@ class _StreamScreenState extends State<StreamScreen> {
       '  outline: none !important;',
       '}',
       'body { background: #000 !important; }',
-      // Hide fullscreen buttons
       '.fullscreen-btn, .fullscreen-button, .vjs-fullscreen-control,',
       '.fp-fullscreen, .mejs-fullscreen-button, .jw-icon-fullscreen,',
       '.pumpy-fullscreen, .vjs-button-fullscreen, .plyr__control--fullscreen,',
       '[class*="fullscreen" i], [class*="Fullsreen" i], [class*="full_screen" i],',
       '[data-fullscreen], button[title*="fullscreen" i], button[aria-label*="fullscreen" i]',
-      '{ display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; }',
-      // Hide vidsrc branding containers
-      '[class*="vidsrc" i], [id*="vidsrc" i], .vidsrc-logo, .vidsrc-text,',
-      '.branding, .logo-text, [class*="logo" i][class*="src" i]'
+      '{ display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; }'
     ].join('\\n');
     (document.head || document.documentElement).appendChild(style);
 
-    // 2) Hide any small element whose text contains 'vidsrc'
-    function hideVidsrcText() {
-      try {
-        var nodes = document.querySelectorAll('a, span, div, p, button, li, em, strong, small');
-        nodes.forEach(function(el) {
-          var t = (el.textContent || '').trim().toLowerCase();
-          if (!t) return;
-          if (t.indexOf('vidsrc') !== -1 || t === 'vid src' || t === 'vid-src') {
-            var r = el.getBoundingClientRect();
-            if (r.width <= 220 && r.height <= 70) {
-              el.style.setProperty('display', 'none', 'important');
-            }
-          }
-        });
-      } catch (e) {}
-    }
-
-    // 3) Hide fullscreen buttons by attribute/class scan
+    //  2) Hide fullscreen buttons by attribute/class scan 
     function hideFullscreenBtns() {
       try {
         document.querySelectorAll('button, a, div, span, svg').forEach(function(el) {
-          var cls = ((el.className && el.className.toString) ? el.className.toString() : '').toLowerCase();
+          var cls   = ((el.className && el.className.toString) ? el.className.toString() : '').toLowerCase();
           var title = (el.getAttribute && el.getAttribute('title') || '').toLowerCase();
-          var aria = (el.getAttribute && el.getAttribute('aria-label') || '').toLowerCase();
-          if (cls.indexOf('fullscreen') !== -1 ||
+          var aria  = (el.getAttribute && el.getAttribute('aria-label') || '').toLowerCase();
+          if (cls.indexOf('fullscreen')   !== -1 ||
               title.indexOf('fullscreen') !== -1 ||
-              aria.indexOf('fullscreen') !== -1) {
+              aria.indexOf('fullscreen')  !== -1) {
             el.style.setProperty('display', 'none', 'important');
           }
         });
       } catch (e) {}
     }
 
+    // 3) Best-effort: patch same-origin iframes' window.open 
+    // Cross-origin iframes throw CORS errors here — those are handled by the
+    // Flutter onCreateWindow callback below.
+    function patchIframeOpen() {
+      try {
+        document.querySelectorAll('iframe').forEach(function(f) {
+          try {
+            if (f.contentWindow) f.contentWindow.open = function() { return null; };
+          } catch (e) {}
+        });
+      } catch (e) {}
+    }
+
     function runAll() {
-      hideVidsrcText();
       hideFullscreenBtns();
+      patchIframeOpen();
     }
 
     runAll();
 
-    // 4) Keep removing elements as they get added/re-rendered by the player
-    var observer = new MutationObserver(function() {
-      runAll();
-    });
+    //  4) Watch for dynamically added/re-rendered elements 
+    var observer = new MutationObserver(function() { runAll(); });
     var start = function() {
       if (document.body) {
         observer.observe(document.body, { childList: true, subtree: true });
@@ -192,55 +173,83 @@ class _StreamScreenState extends State<StreamScreen> {
     };
     start();
 
-    // 5) Prevent JS-triggered native fullscreen
-    document.addEventListener('webkitfullscreenchange', function(e) {
+    // 5) Prevent JS-triggered native fullscreen 
+    document.addEventListener('webkitfullscreenchange', function() {
       if (document.webkitFullscreenElement) {
         document.webkitExitFullscreen && document.webkitExitFullscreen();
       }
     }, true);
-    document.addEventListener('fullscreenchange', function(e) {
+    document.addEventListener('fullscreenchange', function() {
       if (document.fullscreenElement) {
         document.exitFullscreen && document.exitFullscreen();
       }
     }, true);
 
-    // 6) Stub out fullscreen request methods
+    //  6) Stub out fullscreen request methods 
     try {
-      Element.prototype.requestFullscreen = function() {};
-      Element.prototype.webkitRequestFullscreen = function() {};
+      Element.prototype.requestFullscreen              = function() {};
+      Element.prototype.webkitRequestFullscreen        = function() {};
       HTMLVideoElement.prototype.webkitEnterFullscreen = function() {};
     } catch (e) {}
 
-    // 7) Detect video play/pause state and notify Flutter
-    // We send the state EVERY SECOND to keep the Flutter watchdog alive.
-    var videoStateTimer = setInterval(function() {
-      var isPaused = true;
+    //  7) Block window.open  primary ad popup method used in iframes 
+    try { window.open = function() { return null; }; } catch (e) {}
+
+    //  8) Intercept anchor clicks/taps to block ad-host navigation 
+    // ALLOWED is injected at runtime from kAllowedHosts in secrets.dart,
+    // so the host list is never duplicated anywhere in the codebase.
+    (function() {
+      var ALLOWED = $_allowedHostsJs;
+      function isAllowed(url) {
+        try {
+          var h = new URL(url).hostname;
+          return ALLOWED.some(function(a) { return h === a || h.endsWith('.' + a); });
+        } catch (e) {
+          return true; // Relative / unparseable URLs → allow
+        }
+      }
+      function blockAdLink(e) {
+        var el = e.target;
+        while (el && el !== document.documentElement) {
+          if (el.tagName === 'A' && el.href) {
+            if (!isAllowed(el.href)) {
+              e.preventDefault();
+              e.stopPropagation();
+            }
+            return;
+          }
+          el = el.parentElement;
+        }
+      }
+      // Capture phase fires before the player's own handlers
+      document.addEventListener('click',    blockAdLink, true);
+      document.addEventListener('touchend', blockAdLink, true);
+    })();
+
+    //  9) Video play/pause state → Flutter 
+    setInterval(function() {
+      var isPaused   = true;
       var foundVideo = false;
       try {
         var v = document.querySelector('video');
         if (v) {
           foundVideo = true;
-          isPaused = v.paused;
+          isPaused   = v.paused;
         } else {
           var iframes = document.querySelectorAll('iframe');
           for (var i = 0; i < iframes.length; i++) {
             try {
               var iv = iframes[i].contentWindow.document.querySelector('video');
-              if (iv) {
-                foundVideo = true;
-                isPaused = iv.paused;
-                break;
-              }
-            } catch (e) {} // CORS blocked
+              if (iv) { foundVideo = true; isPaused = iv.paused; break; }
+            } catch (e) {}
           }
         }
       } catch (e) {}
-      
-      if (foundVideo) {
-        var newState = isPaused ? 'paused' : 'playing';
-        if (window.flutter_inappwebview) {
-          window.flutter_inappwebview.callHandler('onVideoState', newState);
-        }
+
+      if (foundVideo && window.flutter_inappwebview) {
+        window.flutter_inappwebview.callHandler(
+          'onVideoState', isPaused ? 'paused' : 'playing'
+        );
       }
     }, 1000);
   })();
@@ -260,38 +269,32 @@ class _StreamScreenState extends State<StreamScreen> {
 
                 onWebViewCreated: (controller) {
                   _controller = controller;
-                  
-                  // Listen to video state from JS
+
                   controller.addJavaScriptHandler(
                     handlerName: 'onVideoState',
                     callback: (args) {
-                      if (args.isNotEmpty) {
-                        _canDetectState = true;
-                        _stateWatchdog?.cancel();
-                        // If no update in 4s, assume we lost detection
-                        _stateWatchdog = Timer(const Duration(seconds: 4), () {
-                          if (mounted) setState(() => _canDetectState = false);
-                        });
-                        
-                        final state = args[0] as String;
-                        final isPlaying = state == 'playing';
-                        
-                        // Only rebuild UI if state changed, OR if paused but controls are hidden
-                        if (_isVideoPlaying != isPlaying || (!isPlaying && !_isControlVisible)) {
-                          if (mounted) {
-                            setState(() {
-                              _isVideoPlaying = isPlaying;
-                              if (_isVideoPlaying) {
-                                // If video starts playing, hide the controls
-                                _hideTimer?.cancel();
-                                _isControlVisible = false;
-                              } else {
-                                // If video is paused, show controls constantly
-                                _hideTimer?.cancel();
-                                _isControlVisible = true;
-                              }
-                            });
-                          }
+                      if (args.isEmpty) return;
+
+                      _canDetectState = true;
+                      _stateWatchdog?.cancel();
+                      _stateWatchdog = Timer(const Duration(seconds: 4), () {
+                        if (mounted) setState(() => _canDetectState = false);
+                      });
+
+                      final isPlaying = (args[0] as String) == 'playing';
+
+                      if (_isVideoPlaying != isPlaying ||
+                          (!isPlaying && !_isControlVisible)) {
+                        if (mounted) {
+                          setState(() {
+                            _isVideoPlaying = isPlaying;
+                            _hideTimer?.cancel();
+                            if (_isVideoPlaying) {
+                              _isControlVisible = false;
+                            } else {
+                              _isControlVisible = true;
+                            }
+                          });
                         }
                       }
                     },
@@ -301,10 +304,16 @@ class _StreamScreenState extends State<StreamScreen> {
                 shouldOverrideUrlLoading: (controller, navigationAction) async {
                   final url = navigationAction.request.url?.toString();
                   if (!_isHostAllowed(url)) {
-                    debugPrint('🚫 Blocked: $url');
                     return NavigationActionPolicy.CANCEL;
                   }
                   return NavigationActionPolicy.ALLOW;
+                },
+
+                // Blocks ALL popup/new-window creation from iframes.
+                // Flutter-side guard for cross-origin iframes that call
+                // window.open()  requires supportMultipleWindows: true.
+                onCreateWindow: (controller, createWindowAction) async {
+                  return false;
                 },
 
                 onLoadStart: (controller, url) {
@@ -315,11 +324,11 @@ class _StreamScreenState extends State<StreamScreen> {
                   controller.evaluateJavascript(source: _injectScript);
                 },
 
-                // Block WebView native fullscreen takeover
                 onEnterFullscreen: (controller) async {
                   await controller.evaluateJavascript(
-                    source: "if (document.fullscreenElement) { document.exitFullscreen(); } "
-                            "if (document.webkitFullscreenElement) { document.webkitExitFullscreen(); }",
+                    source:
+                        "if (document.fullscreenElement) document.exitFullscreen();"
+                        "if (document.webkitFullscreenElement) document.webkitExitFullscreen();",
                   );
                 },
 
@@ -331,9 +340,7 @@ class _StreamScreenState extends State<StreamScreen> {
               ),
             ),
 
-          
-          // This detects screen taps to toggle the UI, but because it's 
-          // "translucent", it lets the touches pass through to the WebView.
+          // Translucent tap detector  passes touches through to the WebView.
           if (!_hasError)
             Positioned.fill(
               child: Listener(
@@ -342,7 +349,7 @@ class _StreamScreenState extends State<StreamScreen> {
               ),
             ),
 
-          //  Back Button Overlay 
+          // Back button overlay
           if (!_hasError)
             Positioned(
               top: 20,
@@ -354,18 +361,18 @@ class _StreamScreenState extends State<StreamScreen> {
                     opacity: _isControlVisible ? 1.0 : 0.0,
                     duration: const Duration(milliseconds: 750),
                     child: Padding(
-                  padding: const EdgeInsets.only(left: 6, top: 6),
-                  child: _GlassIconButton(
-                    icon: Icons.arrow_back_ios_new_rounded,
-                    onTap: () => context.pop(),
-                  ),
-                ),
+                      padding: const EdgeInsets.only(left: 6, top: 6),
+                      child: _GlassIconButton(
+                        icon: Icons.arrow_back_ios_new_rounded,
+                        onTap: () => context.pop(),
+                      ),
+                    ),
                   ),
                 ),
               ),
             ),
 
-          //  Error state 
+          // Error state
           if (_hasError)
             Center(
               child: Column(

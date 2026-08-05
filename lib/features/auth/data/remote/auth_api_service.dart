@@ -21,26 +21,26 @@ abstract class AuthApiService {
   factory AuthApiService(Dio dio, {String baseUrl}) = _AuthApiService;
 
   //SignUp
-  @POST(ApiConst.signUp)
+  @POST(AuthAPI.signUp)
   Future<SignupRes> signUp(@Body() SignUpReq body);
 
   //Verify
-  @POST(ApiConst.verify)
+  @POST(AuthAPI.verify)
   Future<VerifyRes> verify(@Body() VerifyReq body);
 
   //SignIn
-  @POST(ApiConst.signIn)
+  @POST(AuthAPI.signIn)
   Future<SigninRes> signIn(@Body() SigninReq body);
 
    //Resent OTP
-  @POST(ApiConst.resentOTP)
+  @POST(AuthAPI.resentOTP)
   Future<ResentOTPRes> resentOTP(@Body() ResentOTPReq body);
 
   //forgot
-  @POST(ApiConst.forgotPassword)
+  @POST(AuthAPI.forgotPassword)
   Future<ForgotpasswordRes> forgotPassword(@Body() ForgotPasswordReq body);
 
   //reset password
-  @POST(ApiConst.resetPassword)
+  @POST(AuthAPI.resetPassword)
   Future<ResetpasswordRes> resetPassword(@Body() ResetpasswordReq body);
 }

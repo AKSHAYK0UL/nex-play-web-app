@@ -155,7 +155,7 @@ Future<void> initDependencies() async {
   );
 
   //recommendation movies bloc
-  sl.registerLazySingleton<MovieRecommendationsBloc>(
+  sl.registerFactory<MovieRecommendationsBloc>(
     () => MovieRecommendationsBloc(
       recommendationsUsecase: sl<RecommendationsUsecase>(),
     ),

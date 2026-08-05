@@ -9,9 +9,9 @@ Dio createDio({
 }) {
   final dio = Dio(
     BaseOptions(
-      baseUrl: ApiConst.baseUrl,
-      connectTimeout: Duration(seconds: ApiConst.connectTimeout),
-      receiveTimeout: Duration(seconds: ApiConst.receiveTimeout),
+      baseUrl: AuthAPI.baseUrl,
+      connectTimeout: Duration(seconds: AuthAPI.connectTimeout),
+      receiveTimeout: Duration(seconds: AuthAPI.receiveTimeout),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -54,11 +54,11 @@ Dio createDio({
 
               // Use a fresh Dio to avoid triggering this interceptor again
               final refreshDio = Dio(
-                BaseOptions(baseUrl: ApiConst.baseUrl),
+                BaseOptions(baseUrl: AuthAPI.baseUrl),
               );
 
               final response = await refreshDio.post(
-                ApiConst.refreshToken,
+                AuthAPI.refreshToken,
                 data: {'refreshToken': tokens.refreshToken},
               );
 

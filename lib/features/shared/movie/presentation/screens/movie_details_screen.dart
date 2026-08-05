@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nex_play/core/router/app_router.dart';
+import 'package:nex_play/core/widgets/image.dart';
 import 'package:nex_play/features/shared/movie/domain/entities/genre.dart';
 import 'package:nex_play/features/shared/movie/domain/entities/movie.dart';
 import 'package:nex_play/features/shared/movie/presentation/bloc/movie_detailed_bloc/movie_detailed_bloc.dart';
@@ -151,15 +152,9 @@ class _Backdrop extends StatelessWidget {
     return Stack(
       fit: StackFit.expand,
       children: [
-        if (path != null)
-          Image.network(
-            "https://image.tmdb.org/t/p/original$path",
-            fit: BoxFit.fill,
-            errorBuilder: (_, __, ___) =>
-                Container(color: const Color(0xFF1C1C1E)),
-          )
-        else
-          Container(color: const Color(0xFF1C1C1E)),
+        path != null
+            ? AppImage(path: path, size: 'original', fit: BoxFit.fill)
+            : Container(color: const Color(0xFF1C1C1E)),
 
         DecoratedBox(
           decoration: BoxDecoration(
@@ -217,35 +212,31 @@ class _TitleRow extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Hero(
-          tag: 'movie-poster-${movie.id}',
-          child: Container(
-            width: 92,
-            height: 138,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.4),
-                  blurRadius: 18,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(14),
-              child: movie.posterPath != null
-                  ? Image.network(
-                      "https://image.tmdb.org/t/p/w342${movie.posterPath}",
-
-                      fit: BoxFit.fill,
-                      errorBuilder: (_, __, ___) =>
-                          Container(color: const Color(0xFF1C1C1E)),
-                    )
-                  : Container(color: const Color(0xFF1C1C1E)),
-            ),
+        Container(
+          width: 92,
+          height: 138,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.4),
+                blurRadius: 18,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(14),
+            child: movie.posterPath != null
+                ? AppImage(
+                    path: movie.posterPath!,
+                    size: 'w342',
+                    fit: BoxFit.fill,
+                  )
+                : Container(color: const Color(0xFF1C1C1E)),
           ),
         ),
+
         const SizedBox(width: 16),
         Expanded(
           child: Column(
@@ -686,7 +677,11 @@ class _RecommendationsSection extends StatelessWidget {
           success: (movies) {
             final list = movies.results.take(10).toList();
             if (list.isEmpty) return const SizedBox.shrink();
-            return HorzontialMovieListContent(title:"You Might Like",movies: list, navTo: () {});
+            return HorzontialMovieListContent(
+              title: "You Might Like",
+              movies: list,
+              navTo: () {},
+            );
           },
         );
       },

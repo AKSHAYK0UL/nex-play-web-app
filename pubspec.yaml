@@ -51,6 +51,8 @@ dependencies:
   flutter_inappwebview: ^6.1.5
   google_nav_bar: ^5.0.7
   font_awesome_flutter: ^11.0.0
+  cache_network_media: ^1.0.5
+  cached_network_image: ^3.4.1
 
 dev_dependencies:
   flutter_test:

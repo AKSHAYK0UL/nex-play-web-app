@@ -29,7 +29,7 @@ class _AuthApiService implements AuthApiService {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            'http://localhost:8080/api/v1/auth/signup',
+            'https://nex-play-auth-service-1.onrender.com/api/v1/auth/signup',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -56,7 +56,7 @@ class _AuthApiService implements AuthApiService {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            'http://localhost:8080/api/v1/auth/verify',
+            'https://nex-play-auth-service-1.onrender.com/api/v1/auth/verify',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -83,7 +83,7 @@ class _AuthApiService implements AuthApiService {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            'http://localhost:8080/api/v1/auth/signin',
+            'https://nex-play-auth-service-1.onrender.com/api/v1/auth/signin',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -110,7 +110,7 @@ class _AuthApiService implements AuthApiService {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            'http://localhost:8080/api/v1/auth/otp/resend',
+            'https://nex-play-auth-service-1.onrender.com/api/v1/auth/otp/resend',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -137,7 +137,7 @@ class _AuthApiService implements AuthApiService {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            'http://localhost:8080/api/v1/auth/password/forgot',
+            'https://nex-play-auth-service-1.onrender.com/api/v1/auth/password/forgot',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -164,7 +164,7 @@ class _AuthApiService implements AuthApiService {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            'http://localhost:8080/api/v1/auth/password/reset',
+            'https://nex-play-auth-service-1.onrender.com/api/v1/auth/password/reset',
             queryParameters: queryParameters,
             data: _data,
           )
