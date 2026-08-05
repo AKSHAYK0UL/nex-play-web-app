@@ -140,7 +140,7 @@ Future<void> initDependencies() async {
   );
 
   //Movie detailed bloc
-  sl.registerLazySingleton<MovieDetailedBloc>(
+  sl.registerFactory<MovieDetailedBloc>(
     () => MovieDetailedBloc(movieDetailedUsecase: sl<MovieDetailedUsecase>()),
   );
 

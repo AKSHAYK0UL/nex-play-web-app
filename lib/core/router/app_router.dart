@@ -8,6 +8,7 @@ import 'package:nex_play/features/auth/presentation/screens/landing_screen.dart'
 import 'package:nex_play/features/auth/presentation/screens/verify_screen.dart';
 import 'package:nex_play/features/bottom_nav_bar/bottom_nav_bar.dart';
 import 'package:nex_play/features/shared/movie/domain/entities/movie.dart';
+import 'package:nex_play/features/shared/movie/presentation/bloc/movie_detailed_bloc/movie_detailed_bloc.dart';
 import 'package:nex_play/features/shared/movie/presentation/bloc/movies_recommendations_bloc/movies_recommendations_bloc.dart';
 import 'package:nex_play/features/shared/movie/presentation/screens/movie_details_screen.dart';
 import 'package:nex_play/features/shared/stream/stream_screen.dart';
@@ -67,8 +68,13 @@ Future<void> initAppRouter() async {
         name: RouteName.movieDetailsScreen,
         builder: (context, state) {
           final movie = state.extra as Movie;
-          return BlocProvider(
-            create: (_) => sl<MovieRecommendationsBloc>(),
+          return MultiBlocProvider(
+            providers: [
+                            BlocProvider(create: (_) => sl<MovieDetailedBloc>(),),
+
+              BlocProvider(create: (_) => sl<MovieRecommendationsBloc>(),),
+            ],
+            
             child: MovieDetailScreen(movie: movie),
           );
         },
@@ -77,7 +83,7 @@ Future<void> initAppRouter() async {
         path: RoutePath.streamScreen,
         name: RouteName.streamScreen,
         builder: (context, state) {
-          final streamUrl = state.extra as String;
+          final streamUrl = state.extra as String? ?? '';
           return StreamScreen(streamUrl: streamUrl);
         },
       ),

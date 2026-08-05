@@ -97,6 +97,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                       _ActionRow(
                         accent: MovieDetailScreen._accent,
                         movie: movie,
+                        isLoading: isLoadingDetails,
                       ),
                       const SizedBox(height: 26),
                       if (errorMessage != null)
@@ -330,22 +331,26 @@ class _MetaText extends StatelessWidget {
 class _ActionRow extends StatelessWidget {
   final Color accent;
   final Movie movie;
-  const _ActionRow({required this.accent, required this.movie});
+  final bool isLoading;
+  const _ActionRow({required this.accent, required this.movie, required this.isLoading});
 
   @override
   Widget build(BuildContext context) {
+    final canPlay = !isLoading && (movie.streamUrl ?? '').isNotEmpty;
     return Row(
       children: [
         Expanded(
           child: Material(
-            color: accent,
+            color: canPlay ? accent : accent.withValues(alpha: 0.4),
             borderRadius: BorderRadius.circular(14),
             child: InkWell(
               borderRadius: BorderRadius.circular(14),
-              onTap: () => context.pushNamed(
-                RouteName.streamScreen,
-                extra: movie.streamUrl,
-              ),
+              onTap: canPlay
+                  ? () => context.pushNamed(
+                        RouteName.streamScreen,
+                        extra: movie.streamUrl,
+                      )
+                  : null,
               splashColor: Colors.white.withValues(alpha: 0.15),
               child: const Padding(
                 padding: EdgeInsets.symmetric(vertical: 14),
