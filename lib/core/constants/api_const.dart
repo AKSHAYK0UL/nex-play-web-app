@@ -4,8 +4,10 @@ class AuthAPI {
     // static const String baseUrl = 'http://localhost:8080/api/v1';
   static const String baseUrl = authBaseURL;
   //Timeout durations in seconds for network requests.
-  static const int connectTimeout = 30;
-  static const int receiveTimeout = 30;
+  // static const int connectTimeout = 30;
+  // static const int receiveTimeout = 30;
+  static const int connectTimeout = 60;
+  static const int receiveTimeout = 60;
   static const int otpCodeLenght = 6;
 
   static const String signUp = '$baseUrl/auth/signup';

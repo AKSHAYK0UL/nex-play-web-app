@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nex_play/core/di/injection.dart';
@@ -10,15 +13,19 @@ import 'package:nex_play/features/bottom_nav_bar/bottom_nav_bar.dart';
 import 'package:nex_play/features/shared/movie/domain/entities/movie.dart';
 import 'package:nex_play/features/shared/movie/presentation/bloc/movie_detailed_bloc/movie_detailed_bloc.dart';
 import 'package:nex_play/features/shared/movie/presentation/bloc/movies_recommendations_bloc/movies_recommendations_bloc.dart';
+import 'package:nex_play/features/shared/movie/presentation/bloc/similar_movies_bloc/similar_movies_bloc.dart';
 import 'package:nex_play/features/shared/movie/presentation/screens/movie_details_screen.dart';
 import 'package:nex_play/features/shared/stream/stream_screen.dart';
 
 late final GoRouter appRouter;
 
+Movie? _cachedMovieFallback; //cache route on the web
+
 Future<void> initAppRouter() async {
   final hasTokens = await sl<AuthLocalDatasource>().hasTokens();
-  final initialLocation =
-      hasTokens ? RoutePath.bottomNavbar : RoutePath.landingPage;
+  final initialLocation = hasTokens
+      ? RoutePath.bottomNavbar
+      : RoutePath.landingPage;
 
   appRouter = GoRouter(
     initialLocation: initialLocation,
@@ -26,8 +33,7 @@ Future<void> initAppRouter() async {
       final loggedIn = await sl<AuthLocalDatasource>().hasTokens();
       final onLanding = state.matchedLocation == RoutePath.landingPage;
       if (loggedIn && onLanding) return RoutePath.bottomNavbar;
-      if (!loggedIn &&
-          _protectedRoutes.contains(state.matchedLocation)) {
+      if (!loggedIn && _protectedRoutes.contains(state.matchedLocation)) {
         return RoutePath.landingPage;
       }
       return null;
@@ -63,19 +69,75 @@ Future<void> initAppRouter() async {
         name: RouteName.bottomNavbar,
         builder: (context, state) => const BottomNavBar(),
       ),
+
+      // GoRoute(
+      //   path: RoutePath.movieDetailsScreen,
+      //   name: RouteName.movieDetailsScreen,
+      //   builder: (context, state) {
+      //     final movie = state.extra as Movie;
+      //     return MultiBlocProvider(
+      //       providers: [
+      //         BlocProvider(create: (_) => sl<MovieDetailedBloc>()),
+      //         BlocProvider(create: (_) => sl<MovieRecommendationsBloc>()),
+      //       ],
+
+      //       child: MovieDetailScreen(movie: movie),
+      //     );
+      //   },
+      // ),
       GoRoute(
         path: RoutePath.movieDetailsScreen,
         name: RouteName.movieDetailsScreen,
         builder: (context, state) {
-          final movie = state.extra as Movie;
+          // Safely try to cast the extra data
+          Movie? movie = state.extra as Movie?;
+
+          //  Use kIsWeb
+          if (kIsWeb) {
+            //  WEB CACHE
+            if (movie != null) {
+              // Navigated normally from inside the app save to cache
+              _cachedMovieFallback = movie;
+            } else if (_cachedMovieFallback != null) {
+              // extra is null (browser back button) pull from cache
+              movie = _cachedMovieFallback;
+            } else {
+              // Both are null (user refreshed the page / hard reload)
+              return Scaffold(
+                body: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('Movie data lost. Please return home.'),
+                      TextButton(
+                        onPressed: () {
+                          context.go(RoutePath.bottomNavbar);
+                        },
+                        child: const Text('Home'),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+          } else {
+            // MOBILE LOGIC
+            if (movie == null) {
+              return const Scaffold(
+                body: Center(child: Text('Error: No movie data provided.')),
+              );
+            }
+          }
+
+          // Return your MultiBlocProvider as normal.
+
           return MultiBlocProvider(
             providers: [
-                            BlocProvider(create: (_) => sl<MovieDetailedBloc>(),),
-
-              BlocProvider(create: (_) => sl<MovieRecommendationsBloc>(),),
+              BlocProvider(create: (_) => sl<MovieDetailedBloc>()),
+              BlocProvider(create: (_) => sl<MovieRecommendationsBloc>()),
+              BlocProvider(create: (_) => sl<SimilarMoviesBloc>()),
             ],
-            
-            child: MovieDetailScreen(movie: movie),
+            child: MovieDetailScreen(movie: movie!),
           );
         },
       ),

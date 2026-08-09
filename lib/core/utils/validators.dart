@@ -17,18 +17,18 @@ class Validators {
     return null;
   }
 
-  //Validates a password (minimum 6 characters)
+  //Validates a password (minimum 8 characters)
   static String? password(String? value) {
     if (value == null || value.isEmpty) {
       return 'Password is required.';
     }
 
-    if (value.length < 6) {
-      return 'Password must be at least 6 characters.';
+    if (value.length < 8) {
+      return 'Password must be at least 8 characters.';
     }
 
     final passwordRegExp = RegExp(
-      r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#\$%^&*(),.?":{}|<>]).{6,}$',
+      r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#\$%^&*(),.?":{}|<>]).{8,}$',
     );
 
     if (!passwordRegExp.hasMatch(value)) {

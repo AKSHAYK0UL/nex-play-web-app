@@ -1,8 +1,13 @@
+
+
+//##########################################################################
 import 'dart:async';
 import 'dart:ui';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nex_play/core/config/secrets.dart';
 
@@ -17,17 +22,28 @@ class StreamScreen extends StatefulWidget {
 
 class _StreamScreenState extends State<StreamScreen> {
   InAppWebViewController? _controller;
-  bool _hasError = false;
 
-  // Back button visibility state
+  // Key to force-rebuild the Web Iframe on demand or recovery
+  Key _webPlayerKey = UniqueKey();
+
+  // Error handling state
+  bool _hasError = false;
+  String _errorMessage = '';
+
+  // Control bar visibility state
   bool _isControlVisible = false;
   Timer? _hideTimer;
 
-  // Video state tracking
+  // Video state tracking (Mobile)
   bool _isVideoPlaying = false;
   bool _canDetectState = false;
   Timer? _stateWatchdog;
 
+  // Web ad-block state
+  int _webAdClickCount = 0;
+  static const int _requiredShieldClicks = 3;
+
+  // Mobile WebView Settings
   final _webViewSettings = InAppWebViewSettings(
     javaScriptEnabled: true,
     mediaPlaybackRequiresUserGesture: false,
@@ -35,8 +51,8 @@ class _StreamScreenState extends State<StreamScreen> {
     transparentBackground: true,
     useShouldOverrideUrlLoading: true,
     disableContextMenu: true,
-    // Must be true so onCreateWindow fires and we can block iframe popups.
-    supportMultipleWindows: true,
+    supportMultipleWindows: false,
+    javaScriptCanOpenWindowsAutomatically: false, // Strictly block popups
   );
 
   @override
@@ -58,18 +74,10 @@ class _StreamScreenState extends State<StreamScreen> {
     super.dispose();
   }
 
-  Future<void> _reload() async {
-    setState(() => _hasError = false);
-    await _controller?.loadUrl(
-      urlRequest: URLRequest(url: WebUri(widget.streamUrl)),
-    );
-  }
-
   bool _isHostAllowed(String? url) {
     if (url == null) return false;
     final uri = Uri.tryParse(url);
     if (uri == null) return false;
-    // kAllowedHosts comes from lib/core/config/secrets.dart (gitignored)
     return kAllowedHosts.any(
       (host) => uri.host == host || uri.host.endsWith('.$host'),
     );
@@ -96,8 +104,23 @@ class _StreamScreenState extends State<StreamScreen> {
     }
   }
 
-  // Builds the JS allowed-hosts array from kAllowedHosts at runtime,
-  // so the list is never duplicated anywhere in the source.
+  void _resetWebStream() {
+    setState(() {
+      _hasError = false;
+      _errorMessage = '';
+      _webAdClickCount = 0;
+      _webPlayerKey = UniqueKey(); // Re-instantiates iframe cleanly
+    });
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Stream reloaded and protected.'),
+        duration: Duration(seconds: 2),
+        backgroundColor: Colors.green,
+      ),
+    );
+  }
+
   String get _allowedHostsJs =>
       '[${kAllowedHosts.map((h) => "'$h'").join(', ')}]';
 
@@ -106,7 +129,6 @@ class _StreamScreenState extends State<StreamScreen> {
     if (window.__vsInjected) return;
     window.__vsInjected = true;
 
-    //  1) Base CSS 
     var style = document.createElement('style');
     style.textContent = [
       '* {',
@@ -126,7 +148,6 @@ class _StreamScreenState extends State<StreamScreen> {
     ].join('\\n');
     (document.head || document.documentElement).appendChild(style);
 
-    //  2) Hide fullscreen buttons by attribute/class scan 
     function hideFullscreenBtns() {
       try {
         document.querySelectorAll('button, a, div, span, svg').forEach(function(el) {
@@ -142,9 +163,6 @@ class _StreamScreenState extends State<StreamScreen> {
       } catch (e) {}
     }
 
-    // 3) Best-effort: patch same-origin iframes' window.open 
-    // Cross-origin iframes throw CORS errors here — those are handled by the
-    // Flutter onCreateWindow callback below.
     function patchIframeOpen() {
       try {
         document.querySelectorAll('iframe').forEach(function(f) {
@@ -162,7 +180,6 @@ class _StreamScreenState extends State<StreamScreen> {
 
     runAll();
 
-    //  4) Watch for dynamically added/re-rendered elements 
     var observer = new MutationObserver(function() { runAll(); });
     var start = function() {
       if (document.body) {
@@ -173,7 +190,6 @@ class _StreamScreenState extends State<StreamScreen> {
     };
     start();
 
-    // 5) Prevent JS-triggered native fullscreen 
     document.addEventListener('webkitfullscreenchange', function() {
       if (document.webkitFullscreenElement) {
         document.webkitExitFullscreen && document.webkitExitFullscreen();
@@ -185,19 +201,18 @@ class _StreamScreenState extends State<StreamScreen> {
       }
     }, true);
 
-    //  6) Stub out fullscreen request methods 
     try {
       Element.prototype.requestFullscreen              = function() {};
       Element.prototype.webkitRequestFullscreen        = function() {};
       HTMLVideoElement.prototype.webkitEnterFullscreen = function() {};
     } catch (e) {}
 
-    //  7) Block window.open  primary ad popup method used in iframes 
-    try { window.open = function() { return null; }; } catch (e) {}
+    try { 
+      window.open = function() { return null; }; 
+      if (window.parent) window.parent.open = function() { return null; };
+      if (window.top) window.top.open = function() { return null; };
+    } catch (e) {}
 
-    //  8) Intercept anchor clicks/taps to block ad-host navigation 
-    // ALLOWED is injected at runtime from kAllowedHosts in secrets.dart,
-    // so the host list is never duplicated anywhere in the codebase.
     (function() {
       var ALLOWED = $_allowedHostsJs;
       function isAllowed(url) {
@@ -205,7 +220,7 @@ class _StreamScreenState extends State<StreamScreen> {
           var h = new URL(url).hostname;
           return ALLOWED.some(function(a) { return h === a || h.endsWith('.' + a); });
         } catch (e) {
-          return true; // Relative / unparseable URLs → allow
+          return false; 
         }
       }
       function blockAdLink(e) {
@@ -221,12 +236,10 @@ class _StreamScreenState extends State<StreamScreen> {
           el = el.parentElement;
         }
       }
-      // Capture phase fires before the player's own handlers
       document.addEventListener('click',    blockAdLink, true);
       document.addEventListener('touchend', blockAdLink, true);
     })();
 
-    //  9) Video play/pause state → Flutter 
     setInterval(function() {
       var isPaused   = true;
       var foundVideo = false;
@@ -255,93 +268,210 @@ class _StreamScreenState extends State<StreamScreen> {
   })();
   """;
 
+  Widget _buildWebPlayer() {
+    return Stack(
+      key: _webPlayerKey,
+      children: [
+        Positioned.fill(
+          child: HtmlWidget(
+            '''
+            <style>
+              html, body {
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                overflow: hidden !important;
+                background: #000 !important;
+              }
+              iframe {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                border: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                display: block !important;
+              }
+            </style>
+            
+            <iframe
+              src="${widget.streamUrl}"
+              scrolling="no"
+              allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+              sandbox="allow-scripts allow-forms allow-presentation allow-encrypted-media"
+              referrerpolicy="no-referrer"
+              allowfullscreen="true">
+            </iframe>
+            ''',
+            customStylesBuilder: (element) {
+              if (element.localName == 'iframe') {
+                return {
+                  'position': 'fixed',
+                  'top': '0',
+                  'left': '0',
+                  'width': '100vw',
+                  'height': '100vh',
+                  'border': 'none',
+                  'margin': '0',
+                  'padding': '0',
+                  'display': 'block',
+                };
+              }
+              return {
+                'margin': '0',
+                'padding': '0',
+                'width': '100%',
+                'height': '100%',
+              };
+            },
+          ),
+        ),
+
+        // WEB AD SHIELD OVERLAY (Absorbs ad trigger taps)
+        if (_webAdClickCount < _requiredShieldClicks)
+          Positioned.fill(
+            child: Listener(
+              behavior: HitTestBehavior.opaque,
+              onPointerDown: (_) {
+                setState(() => _webAdClickCount++);
+                final remaining = _requiredShieldClicks - _webAdClickCount;
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      remaining > 0
+                          ? 'Ad Shield: Tapped $_webAdClickCount/$_requiredShieldClicks ($remaining more to unlock player)'
+                          : 'Player unlocked! Tap play on the video.',
+                    ),
+                    duration: const Duration(seconds: 2),
+                    backgroundColor: Colors.blueAccent,
+                  ),
+                );
+              },
+              child: Container(color: Colors.transparent),
+            ),
+          ),
+
+      
+      ],
+    );
+  }
+
+  Widget _buildMobilePlayer() {
+    return InAppWebView(
+      initialUrlRequest: URLRequest(url: WebUri(widget.streamUrl)),
+      initialSettings: _webViewSettings,
+      onWebViewCreated: (controller) {
+        _controller = controller;
+
+        controller.addJavaScriptHandler(
+          handlerName: 'onVideoState',
+          callback: (args) {
+            if (args.isEmpty) return;
+
+            _canDetectState = true;
+            _stateWatchdog?.cancel();
+            _stateWatchdog = Timer(const Duration(seconds: 4), () {
+              if (mounted) setState(() => _canDetectState = false);
+            });
+
+            final isPlaying = (args[0] as String) == 'playing';
+
+            if (_isVideoPlaying != isPlaying ||
+                (!isPlaying && !_isControlVisible)) {
+              if (mounted) {
+                setState(() {
+                  _isVideoPlaying = isPlaying;
+                  _hideTimer?.cancel();
+                  if (_isVideoPlaying) {
+                    _isControlVisible = false;
+                  } else {
+                    _isControlVisible = true;
+                  }
+                });
+              }
+            }
+          },
+        );
+      },
+      shouldOverrideUrlLoading: (controller, navigationAction) async {
+        final url = navigationAction.request.url?.toString();
+
+        if (url == null) return NavigationActionPolicy.CANCEL;
+
+        // Block non-HTTP schemas (e.g., intent://, market://, whatsapp://)
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+          return NavigationActionPolicy.CANCEL;
+        }
+
+        // Malicious domains blacklist
+        final blockedKeywords = ['playin04.com', 'gohappyin.com', 'redtrackApi'];
+        if (blockedKeywords.any((keyword) => url.contains(keyword))) {
+          return NavigationActionPolicy.CANCEL;
+        }
+
+        // Whitelist enforcement
+        if (!_isHostAllowed(url)) {
+          return NavigationActionPolicy.CANCEL;
+        }
+
+        return NavigationActionPolicy.ALLOW;
+      },
+      onCreateWindow: (controller, createWindowAction) async {
+        return false;
+      },
+      onLoadStart: (controller, url) {
+        controller.evaluateJavascript(source: _injectScript);
+      },
+      onLoadStop: (controller, url) {
+        controller.evaluateJavascript(source: _injectScript);
+      },
+      onEnterFullscreen: (controller) async {
+        await controller.evaluateJavascript(
+          source:
+              "if (document.fullscreenElement) document.exitFullscreen();"
+              "if (document.webkitFullscreenElement) document.webkitExitFullscreen();",
+        );
+      },
+      onReceivedError: (controller, request, error) {
+        if (request.isForMainFrame == true && mounted) {
+          setState(() {
+            _hasError = true;
+            _errorMessage = error.description.isNotEmpty
+                ? error.description
+                : 'Failed to load video stream.';
+          });
+        }
+      },
+      onReceivedHttpError: (controller, request, errorResponse) {
+        if (request.isForMainFrame == true && mounted) {
+          setState(() {
+            _hasError = true;
+            _errorMessage =
+                'HTTP Error ${errorResponse.statusCode}: ${errorResponse.reasonPhrase ?? "Unable to reach video server"}';
+          });
+        }
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
         children: [
+          // Active Player View (Web or Mobile)
           if (!_hasError)
             Positioned.fill(
-              child: InAppWebView(
-                initialUrlRequest: URLRequest(url: WebUri(widget.streamUrl)),
-                initialSettings: _webViewSettings,
-
-                onWebViewCreated: (controller) {
-                  _controller = controller;
-
-                  controller.addJavaScriptHandler(
-                    handlerName: 'onVideoState',
-                    callback: (args) {
-                      if (args.isEmpty) return;
-
-                      _canDetectState = true;
-                      _stateWatchdog?.cancel();
-                      _stateWatchdog = Timer(const Duration(seconds: 4), () {
-                        if (mounted) setState(() => _canDetectState = false);
-                      });
-
-                      final isPlaying = (args[0] as String) == 'playing';
-
-                      if (_isVideoPlaying != isPlaying ||
-                          (!isPlaying && !_isControlVisible)) {
-                        if (mounted) {
-                          setState(() {
-                            _isVideoPlaying = isPlaying;
-                            _hideTimer?.cancel();
-                            if (_isVideoPlaying) {
-                              _isControlVisible = false;
-                            } else {
-                              _isControlVisible = true;
-                            }
-                          });
-                        }
-                      }
-                    },
-                  );
-                },
-
-                shouldOverrideUrlLoading: (controller, navigationAction) async {
-                  final url = navigationAction.request.url?.toString();
-                  if (!_isHostAllowed(url)) {
-                    return NavigationActionPolicy.CANCEL;
-                  }
-                  return NavigationActionPolicy.ALLOW;
-                },
-
-                // Blocks ALL popup/new-window creation from iframes.
-                // Flutter-side guard for cross-origin iframes that call
-                // window.open()  requires supportMultipleWindows: true.
-                onCreateWindow: (controller, createWindowAction) async {
-                  return false;
-                },
-
-                onLoadStart: (controller, url) {
-                  controller.evaluateJavascript(source: _injectScript);
-                },
-
-                onLoadStop: (controller, url) {
-                  controller.evaluateJavascript(source: _injectScript);
-                },
-
-                onEnterFullscreen: (controller) async {
-                  await controller.evaluateJavascript(
-                    source:
-                        "if (document.fullscreenElement) document.exitFullscreen();"
-                        "if (document.webkitFullscreenElement) document.webkitExitFullscreen();",
-                  );
-                },
-
-                onReceivedError: (controller, request, error) {
-                  if (request.isForMainFrame == true && mounted) {
-                    setState(() => _hasError = true);
-                  }
-                },
-              ),
+              child: kIsWeb ? _buildWebPlayer() : _buildMobilePlayer(),
             ),
 
-          // Translucent tap detector  passes touches through to the WebView.
-          if (!_hasError)
+          // Tap gesture overlay for controls (Mobile only)
+          if (!_hasError && !kIsWeb)
             Positioned.fill(
               child: Listener(
                 behavior: HitTestBehavior.translucent,
@@ -349,19 +479,22 @@ class _StreamScreenState extends State<StreamScreen> {
               ),
             ),
 
-          // Back button overlay
-          if (!_hasError)
-            Positioned(
-              top: 20,
-              left: -20,
-              child: SafeArea(
-                child: IgnorePointer(
-                  ignoring: !_isControlVisible,
-                  child: AnimatedOpacity(
-                    opacity: _isControlVisible ? 1.0 : 0.0,
-                    duration: const Duration(milliseconds: 750),
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 6, top: 6),
+          // Top Header Bar (Back Button)
+          Positioned(
+            top: 20,
+            left: 10,
+            right: 10,
+            child: SafeArea(
+              child: IgnorePointer(
+                ignoring: !_hasError && !kIsWeb && !_isControlVisible,
+                child: AnimatedOpacity(
+                  opacity:
+                      (_hasError || kIsWeb || _isControlVisible) ? 1.0 : 0.0,
+                  duration: const Duration(milliseconds: 300),
+                  child: Visibility(
+                    visible: !kIsWeb,
+                    child: Align(
+                      alignment: Alignment.topLeft,
                       child: _GlassIconButton(
                         icon: Icons.arrow_back_ios_new_rounded,
                         onTap: () => context.pop(),
@@ -371,8 +504,9 @@ class _StreamScreenState extends State<StreamScreen> {
                 ),
               ),
             ),
+          ),
 
-          // Error state
+          // ERROR OVERLAY WITH RETRY ACTION
           if (_hasError)
             Center(
               child: Column(
@@ -380,13 +514,26 @@ class _StreamScreenState extends State<StreamScreen> {
                 children: [
                   const Icon(Icons.error_outline, color: Colors.red, size: 52),
                   const SizedBox(height: 12),
-                  const Text(
-                    'Failed to load video',
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  Text(
+                    _errorMessage.isNotEmpty
+                        ? _errorMessage
+                        : 'Failed to load video',
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                    textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton.icon(
-                    onPressed: _reload,
+                    onPressed: () {
+                      if (kIsWeb) {
+                        _resetWebStream();
+                      } else {
+                        setState(() {
+                          _hasError = false;
+                          _errorMessage = '';
+                        });
+                        _controller?.reload();
+                      }
+                    },
                     icon: const Icon(Icons.refresh),
                     label: const Text('Retry'),
                     style: ElevatedButton.styleFrom(
@@ -415,13 +562,13 @@ class _GlassIconButton extends StatelessWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
         child: Material(
-          color: Colors.white.withOpacity(0.14),
+          color: Colors.white.withValues(alpha: 0.14),
           shape: const CircleBorder(),
           child: InkWell(
             customBorder: const CircleBorder(),
             onTap: onTap,
             child: Padding(
-              padding: const EdgeInsets.all(9),
+              padding: const EdgeInsets.all(10),
               child: Icon(icon, color: Colors.white, size: 18),
             ),
           ),
