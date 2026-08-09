@@ -23,6 +23,8 @@ class RecommendationsSection extends StatelessWidget {
               title: "You Might Like",
               movies: list,
               navTo: () {},
+              hPadding: 0,
+              vPadding: 0,
             );
           },
         );

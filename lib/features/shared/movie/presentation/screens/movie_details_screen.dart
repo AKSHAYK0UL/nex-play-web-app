@@ -76,6 +76,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
         );
 
         return Scaffold(
+                    // backgroundColor: Colors.white,
           backgroundColor: Colors.black,
           body: CustomScrollView(
             physics: const BouncingScrollPhysics(),

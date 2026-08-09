@@ -9,16 +9,26 @@ class HorzontialMovieListContent extends StatelessWidget {
   final String title;
   final List<Movie> movies;
   final VoidCallback navTo;
+  final double hPadding;
+  final double vPadding;
   const HorzontialMovieListContent({
     super.key,
     required this.title,
     required this.movies,
     required this.navTo,
+    this.hPadding = 0,
+    this.vPadding = 0,
   });
 
   @override
   Widget build(BuildContext context) {
-    return _movieContent(title: title, movies: movies, onTap: navTo);
+    return _movieContent(
+      title: title,
+      movies: movies,
+      onTap: navTo,
+      hPadding: hPadding,
+      vPadding: vPadding,
+    );
   }
 }
 
@@ -50,13 +60,15 @@ Widget _movieContent({
   required String title,
   required List<Movie> movies,
   required VoidCallback onTap,
+  required double hPadding,
+  required double vPadding,
 }) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     mainAxisSize: MainAxisSize.min,
     children: [
       Padding(
-        padding: const EdgeInsets.fromLTRB(20, 0, 16, 14),
+        padding: EdgeInsets.fromLTRB(hPadding, 0, hPadding, 14),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -77,7 +89,7 @@ Widget _movieContent({
         height: 234,
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding:  EdgeInsets.symmetric(horizontal: hPadding),
           physics: const BouncingScrollPhysics(),
           itemCount: movies.length,
           itemBuilder: (context, index) => Padding(
