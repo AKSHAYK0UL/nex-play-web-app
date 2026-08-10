@@ -24,12 +24,14 @@ import 'package:nex_play/features/shared/movie/domain/usecases/movie_detailed_us
 import 'package:nex_play/features/shared/movie/domain/usecases/now_playing_usecase.dart';
 import 'package:nex_play/features/shared/movie/domain/usecases/recommendations_usecase.dart';
 import 'package:nex_play/features/shared/movie/domain/usecases/similar_movie_usecase.dart';
+import 'package:nex_play/features/shared/movie/domain/usecases/toprated_usecase.dart';
 import 'package:nex_play/features/shared/movie/domain/usecases/trending_usecase.dart';
 import 'package:nex_play/features/shared/movie/domain/usecases/upcoming_usecase.dart';
 import 'package:nex_play/features/shared/movie/presentation/bloc/movie_detailed_bloc/movie_detailed_bloc.dart';
 import 'package:nex_play/features/shared/movie/presentation/bloc/movies_recommendations_bloc/movies_recommendations_bloc.dart';
 import 'package:nex_play/features/shared/movie/presentation/bloc/nowplaying_movies_bloc/bloc/nowplaymovies_bloc.dart';
 import 'package:nex_play/features/shared/movie/presentation/bloc/similar_movies_bloc/similar_movies_bloc.dart';
+import 'package:nex_play/features/shared/movie/presentation/bloc/toprated_movies_bloc/top_rated_movies_bloc.dart';
 import 'package:nex_play/features/shared/movie/presentation/bloc/trending_movies_bloc/bloc/trending_movies_bloc.dart';
 import 'package:nex_play/features/shared/movie/presentation/bloc/upcoming_movies_bloc/upcoming_movies_bloc.dart';
 
@@ -146,9 +148,13 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton<SimilarMovieUsecase>(
     () => SimilarMovieUsecase(sl<MovieRepository>()),
   );
-  
+
   sl.registerLazySingleton<UpcomingUsecase>(
     () => UpcomingUsecase(sl<MovieRepository>()),
+  );
+
+  sl.registerLazySingleton<TopratedUsecase>(
+    () => TopratedUsecase(sl<MovieRepository>()),
   );
 
   //Movie detailed bloc
@@ -181,5 +187,11 @@ Future<void> initDependencies() async {
   //upcoming movies bloc
   sl.registerLazySingleton<UpcomingMoviesBloc>(
     () => UpcomingMoviesBloc(upcomingUsecase: sl<UpcomingUsecase>()),
+  );
+
+  //top rated movies
+
+  sl.registerLazySingleton<TopRatedMoviesBloc>(
+    () => TopRatedMoviesBloc(topratedUsecase: sl<TopratedUsecase>()),
   );
 }

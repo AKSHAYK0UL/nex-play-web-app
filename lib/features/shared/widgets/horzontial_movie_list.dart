@@ -103,6 +103,7 @@ Widget _movieContent({
 }
 
 Widget _movieCard({required BuildContext context, required Movie movie}) {
+  final hasPoster = (movie.posterPath ?? '').isNotEmpty;
   return SizedBox(
     width: 128,
     child: Material(
@@ -134,12 +135,13 @@ Widget _movieCard({required BuildContext context, required Movie movie}) {
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
-                      AppImage(
-                        path: movie.posterPath!,
-                        size: 'w342',
-                        fit: BoxFit.cover,
-                      ),
-
+                      hasPoster
+                          ? AppImage(
+                              path: movie.posterPath!,
+                              size: 'w342',
+                              fit: BoxFit.cover,
+                            )
+                          : Container(color: const Color(0xFF1C1C1E)),
                       if (movie.voteAverage != null && movie.voteAverage! > 0)
                         Positioned(
                           top: 8,

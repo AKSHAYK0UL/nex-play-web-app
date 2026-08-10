@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nex_play/features/home/presentation/widgets/carousel_slider.dart';
+import 'package:nex_play/features/home/presentation/widgets/top_rated_section.dart';
 import 'package:nex_play/features/home/presentation/widgets/trending_section.dart';
 import 'package:nex_play/features/home/presentation/widgets/upcoming_section.dart';
 
@@ -43,10 +44,11 @@ class HomeScreen extends StatelessWidget {
             child: BuildCarouselSlider(),
           ),
         ),
-        const SliverToBoxAdapter(child: BuildUpcomingMoviesList()),
 
-        const SliverToBoxAdapter(child: SizedBox(height: 32)),
+        // const SliverToBoxAdapter(child: BuildUpcomingMoviesList()),
         const SliverToBoxAdapter(child: BuildTrendingList()),
+        const SliverToBoxAdapter(child: SizedBox(height: 32)),
+        const SliverToBoxAdapter(child: BuildTopRatedMoviesList()),
       ],
     );
   }

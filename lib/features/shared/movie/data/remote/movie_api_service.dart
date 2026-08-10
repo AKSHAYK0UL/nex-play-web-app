@@ -4,7 +4,6 @@ import 'package:nex_play/core/models/api_response.dart';
 import 'package:nex_play/core/paged_result/paged.dart';
 import 'package:nex_play/features/shared/movie/data/models/movie.dart';
 import 'package:retrofit/retrofit.dart';
-
 part 'movie_api_service.g.dart';
 
 @RestApi()

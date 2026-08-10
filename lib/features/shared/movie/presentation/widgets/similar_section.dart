@@ -15,7 +15,7 @@ class SimilarSection extends StatelessWidget {
         return state.when(
           initial: () => const SizedBox.shrink(),
           loading: () => HorzontialMovieListLoading(),
-          error: (err) => HorzontialMovieListError(message: err),
+          error: (err) => const SizedBox.shrink(),
           success: (movies) {
             final list = movies.results.take(10).toList();
             if (list.isEmpty) return const SizedBox.shrink();

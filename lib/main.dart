@@ -8,10 +8,12 @@ import 'package:nex_play/core/router/app_router.dart';
 import 'package:nex_play/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:nex_play/features/shared/movie/presentation/bloc/nowplaying_movies_bloc/bloc/nowplaymovies_bloc.dart';
 import 'package:nex_play/features/shared/movie/presentation/bloc/nowplaying_movies_bloc/bloc/nowplaymovies_event.dart';
+import 'package:nex_play/features/shared/movie/presentation/bloc/toprated_movies_bloc/top_rated_movies_bloc.dart';
+import 'package:nex_play/features/shared/movie/presentation/bloc/toprated_movies_bloc/top_rated_movies_event.dart';
 import 'package:nex_play/features/shared/movie/presentation/bloc/trending_movies_bloc/bloc/trending_movies_bloc.dart';
 import 'package:nex_play/features/shared/movie/presentation/bloc/trending_movies_bloc/bloc/trending_movies_event.dart';
-import 'package:nex_play/features/shared/movie/presentation/bloc/upcoming_movies_bloc/upcoming_movies_bloc.dart';
-import 'package:nex_play/features/shared/movie/presentation/bloc/upcoming_movies_bloc/upcoming_movies_event.dart';
+// import 'package:nex_play/features/shared/movie/presentation/bloc/upcoming_movies_bloc/upcoming_movies_bloc.dart';
+// import 'package:nex_play/features/shared/movie/presentation/bloc/upcoming_movies_bloc/upcoming_movies_event.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -56,10 +58,19 @@ class NexPlay extends StatelessWidget {
               ),
             ),
         ),
+        // BlocProvider(
+        //   create: (_) => sl<UpcomingMoviesBloc>()
+        //     ..add(
+        //       const UpcomingMoviesEvent.getUpcomingMovies(
+        //         lang: 'en-US',
+        //         page: 1,
+        //       ),
+        //     ),
+        // ),
         BlocProvider(
-          create: (_) => sl<UpcomingMoviesBloc>()
+          create: (_) => sl<TopRatedMoviesBloc>()
             ..add(
-              const UpcomingMoviesEvent.getUpcomingMovies(
+              const TopRatedMoviesEvent.getTopRatedMovies(
                 lang: 'en-US',
                 page: 1,
               ),
