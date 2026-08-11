@@ -16,6 +16,15 @@ import 'package:nex_play/features/shared/movie/presentation/bloc/movies_recommen
 import 'package:nex_play/features/shared/movie/presentation/bloc/similar_movies_bloc/similar_movies_bloc.dart';
 import 'package:nex_play/features/shared/movie/presentation/screens/movie_details_screen.dart';
 import 'package:nex_play/features/shared/stream/stream_screen.dart';
+import 'package:nex_play/features/shared/widgets/grid_movies_list.dart';
+import 'package:nex_play/core/enums/grid_movie_type.dart';
+import 'package:nex_play/features/shared/movie/presentation/bloc/trending_movies_bloc/bloc/trending_movies_bloc.dart';
+import 'package:nex_play/features/shared/movie/presentation/bloc/trending_movies_bloc/bloc/trending_movies_event.dart';
+import 'package:nex_play/features/shared/movie/presentation/bloc/toprated_movies_bloc/top_rated_movies_bloc.dart';
+import 'package:nex_play/features/shared/movie/presentation/bloc/toprated_movies_bloc/top_rated_movies_event.dart';
+import 'package:nex_play/features/shared/movie/presentation/bloc/similar_movies_bloc/similar_movies_event.dart';
+import 'package:nex_play/features/shared/movie/presentation/bloc/movies_recommendations_bloc/movies_recommendations_event.dart';
+import 'package:nex_play/core/enums/time_window.dart';
 
 late final GoRouter appRouter;
 
@@ -149,6 +158,39 @@ Future<void> initAppRouter() async {
           return StreamScreen(streamUrl: streamUrl);
         },
       ),
+      GoRoute(
+        path: RoutePath.gridMoviesScreen,
+        name: RouteName.gridMoviesScreen,
+        builder: (context, state) {
+          final params = state.extra as GridMoviesParams;
+          switch (params.type) {
+            case GridMoviesType.trending:
+              return BlocProvider(
+                create: (_) => sl<TrendingMoviesBloc>()
+                  ..add(const TrendingMoviesEvent.getTrending(lang: 'en-US', page: 1, timeWindow: TimeWindow.week)),
+                child: GridMoviesScreen(params: params),
+              );
+            case GridMoviesType.topRated:
+              return BlocProvider(
+                create: (_) => sl<TopRatedMoviesBloc>()
+                  ..add(const TopRatedMoviesEvent.getTopRatedMovies(lang: 'en-US', page: 1)),
+                child: GridMoviesScreen(params: params),
+              );
+            case GridMoviesType.similar:
+              return BlocProvider(
+                create: (_) => sl<SimilarMoviesBloc>()
+                  ..add(SimilarMoviesEvent.getSimilarMovies(id: params.movieId!, lang: 'en-US', page: 1)),
+                child: GridMoviesScreen(params: params),
+              );
+            case GridMoviesType.recommendation:
+              return BlocProvider(
+                create: (_) => sl<MovieRecommendationsBloc>()
+                  ..add(MovieRecommendationsEvent.getMoviesRecommendations(id: params.movieId!, lang: 'en-US', page: 1)),
+                child: GridMoviesScreen(params: params),
+              );
+          }
+        },
+      ),
     ],
   );
 }
@@ -157,6 +199,7 @@ const _protectedRoutes = {
   RoutePath.bottomNavbar,
   RoutePath.movieDetailsScreen,
   RoutePath.streamScreen,
+  RoutePath.gridMoviesScreen,
 };
 
 // path class "/name"
@@ -169,6 +212,7 @@ class RoutePath {
   static const String homeScreen = "/home_screen";
   static const String movieDetailsScreen = "/movie_details_screen";
   static const String streamScreen = "/stream_screen";
+  static const String gridMoviesScreen = "/grid_movies_screen";
 }
 
 // name class "name"
@@ -181,4 +225,5 @@ class RouteName {
   static const String homeScreen = "home_screen";
   static const String movieDetailsScreen = "movie_details_screen";
   static const String streamScreen = "stream_screen";
+  static const String gridMoviesScreen = "grid_movies_screen";
 }

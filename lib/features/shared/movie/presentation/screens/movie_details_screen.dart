@@ -143,10 +143,10 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                         const SizedBox(height: 30),
 
                         //recommendation section
-                        RecommendationsSection(),
+                        RecommendationsSection(movieId: widget.movie.id),
                         //similar section
                         const SizedBox(height: 20),
-                        SimilarSection(),
+                        SimilarSection(movieId: widget.movie.id),
                       ],
                     ],
                   ),
