@@ -1,353 +1,3 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:go_router/go_router.dart';
-// import 'package:nex_play/core/enums/grid_movie_type.dart';
-// import 'package:nex_play/core/enums/time_window.dart';
-// import 'package:nex_play/core/paged_result/paged_resullt.dart';
-// import 'package:nex_play/core/router/app_router.dart';
-// import 'package:nex_play/core/widgets/image.dart';
-// import 'package:nex_play/features/shared/movie/domain/entities/movie.dart';
-// import 'package:nex_play/features/shared/movie/presentation/bloc/movies_recommendations_bloc/movies_recommendations_bloc.dart';
-// import 'package:nex_play/features/shared/movie/presentation/bloc/movies_recommendations_bloc/movies_recommendations_event.dart';
-// import 'package:nex_play/features/shared/movie/presentation/bloc/movies_recommendations_bloc/movies_recommendations_state.dart';
-// import 'package:nex_play/features/shared/movie/presentation/bloc/similar_movies_bloc/similar_movies_bloc.dart';
-// import 'package:nex_play/features/shared/movie/presentation/bloc/similar_movies_bloc/similar_movies_event.dart';
-// import 'package:nex_play/features/shared/movie/presentation/bloc/similar_movies_bloc/similar_movies_state.dart';
-// import 'package:nex_play/features/shared/movie/presentation/bloc/toprated_movies_bloc/top_rated_movies_bloc.dart';
-// import 'package:nex_play/features/shared/movie/presentation/bloc/toprated_movies_bloc/top_rated_movies_event.dart';
-// import 'package:nex_play/features/shared/movie/presentation/bloc/toprated_movies_bloc/top_rated_movies_state.dart';
-// import 'package:nex_play/features/shared/movie/presentation/bloc/trending_movies_bloc/bloc/trending_movies_bloc.dart';
-// import 'package:nex_play/features/shared/movie/presentation/bloc/trending_movies_bloc/bloc/trending_movies_event.dart';
-// import 'package:nex_play/features/shared/movie/presentation/bloc/trending_movies_bloc/bloc/trending_movies_state.dart';
-
-
-
-// class GridMoviesParams {
-//   final GridMoviesType type;
-//   final String title;
-//   final int? movieId; // required for similar/recommendation
-
-//   const GridMoviesParams({
-//     required this.type,
-//     required this.title,
-//     this.movieId,
-//   });
-// }
-
-// class GridMoviesScreen extends StatelessWidget {
-//   final GridMoviesParams params;
-
-//   const GridMoviesScreen({super.key, required this.params});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: const Color(0xFF141416),
-//       appBar: AppBar(
-//         title: Text(
-//           params.title,
-//           style: const TextStyle(
-//             color: Colors.white,
-//             fontWeight: FontWeight.w700,
-//             fontSize: 20,
-//           ),
-//         ),
-//         backgroundColor: Colors.transparent,
-//         elevation: 0,
-//         iconTheme: const IconThemeData(color: Colors.white),
-//       ),
-//       body: _buildBody(),
-//     );
-//   }
-
-//   Widget _buildBody() {
-//     switch (params.type) {
-//       case GridMoviesType.trending:
-//         return BlocBuilder<TrendingMoviesBloc, TrendingMoviesState>(
-//           builder: (context, state) {
-//             return state.when(
-//               initial: () => const SizedBox.shrink(),
-//               loading: () => const Center(child: CircularProgressIndicator()),
-//               error: (err) => Center(child: Text(err, style: const TextStyle(color: Colors.white))),
-//               success: (movies) => _buildGridAndPagination(context, movies),
-//             );
-//           },
-//         );
-//       case GridMoviesType.topRated:
-//         return BlocBuilder<TopRatedMoviesBloc, TopRatedMoviesState>(
-//           builder: (context, state) {
-//             return state.when(
-//               initial: () => const SizedBox.shrink(),
-//               loading: () => const Center(child: CircularProgressIndicator()),
-//               error: (err) => Center(child: Text(err, style: const TextStyle(color: Colors.white))),
-//               success: (movies) => _buildGridAndPagination(context, movies),
-//             );
-//           },
-//         );
-//       case GridMoviesType.similar:
-//         return BlocBuilder<SimilarMoviesBloc, SimilarMoviesState>(
-//           builder: (context, state) {
-//             return state.when(
-//               initial: () => const SizedBox.shrink(),
-//               loading: () => const Center(child: CircularProgressIndicator()),
-//               error: (err) => Center(child: Text(err, style: const TextStyle(color: Colors.white))),
-//               success: (movies) => _buildGridAndPagination(context, movies),
-//             );
-//           },
-//         );
-//       case GridMoviesType.recommendation:
-//         return BlocBuilder<MovieRecommendationsBloc, MovieRecommendationsState>(
-//           builder: (context, state) {
-//             return state.when(
-//               initial: () => const SizedBox.shrink(),
-//               loading: () => const Center(child: CircularProgressIndicator()),
-//               error: (err) => Center(child: Text(err, style: const TextStyle(color: Colors.white))),
-//               success: (movies) => _buildGridAndPagination(context, movies),
-//             );
-//           },
-//         );
-//     }
-//   }
-
-//   Widget _buildGridAndPagination(BuildContext context, PagedResullt<Movie> result) {
-//     if (result.results.isEmpty) {
-//       return const Center(
-//         child: Text("No movies found", style: TextStyle(color: Colors.white54)),
-//       );
-//     }
-
-//     return CustomScrollView(
-//       physics: const BouncingScrollPhysics(),
-//       slivers: [
-//         SliverPadding(
-//           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-//           sliver: SliverGrid(
-//             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-//               crossAxisCount: 2,
-//               childAspectRatio: 0.6,
-//               crossAxisSpacing: 16,
-//               mainAxisSpacing: 16,
-//             ),
-//             delegate: SliverChildBuilderDelegate(
-//               (context, index) {
-
-//                 final movie = result.results[index];
-//                 return _MovieGridCard(movie: movie);
-//               },
-//               childCount: result.results.length,
-//             ),
-//           ),
-//         ),
-//         SliverToBoxAdapter(
-//           child: _buildPagination(context, result),
-//         ),
-//       ],
-//     );
-//   }
-
-//   Widget _buildPagination(BuildContext context, PagedResullt<Movie> result) {
-//     final currentPage = result.page;
-//     final totalPages = result.totalPage;
-
-//     // Limit pages displayed, e.g., show around current page
-//     int startPage = (currentPage - 2).clamp(1, totalPages);
-//     int endPage = (currentPage + 2).clamp(1, totalPages);
-    
-//     // Ensure we always show up to 5 pages if available
-//     if (endPage - startPage < 4 && totalPages >= 5) {
-//       if (startPage == 1) {
-//         endPage = 5.clamp(1, totalPages);
-//       } else if (endPage == totalPages) {
-//         startPage = (totalPages - 4).clamp(1, totalPages);
-//       }
-//     }
-
-//     final pages = <int>[];
-//     for (int i = startPage; i <= endPage; i++) {
-//       pages.add(i);
-//     }
-
-//     return Padding(
-//       padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-//       child: Row(
-//         mainAxisAlignment: MainAxisAlignment.center,
-//         children: [
-//           // Previous button
-//           IconButton(
-//             onPressed: currentPage > 1 ? () => _fetchPage(context, currentPage - 1) : null,
-//             icon: const Icon(Icons.arrow_back_ios_rounded, size: 16),
-//             color: Colors.white,
-//             disabledColor: Colors.white24,
-//           ),
-          
-//           // Page numbers
-//           ...pages.map((page) {
-//             final isCurrent = page == currentPage;
-//             return GestureDetector(
-//               onTap: () {
-//                 if (!isCurrent) _fetchPage(context, page);
-//               },
-//               child: Container(
-//                 margin: const EdgeInsets.symmetric(horizontal: 4),
-//                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-//                 decoration: BoxDecoration(
-//                   color: isCurrent ? Colors.white : Colors.transparent,
-//                   borderRadius: BorderRadius.circular(8),
-//                   border: isCurrent ? null : Border.all(color: Colors.white24),
-//                 ),
-//                 child: Text(
-//                   page.toString(),
-//                   style: TextStyle(
-//                     color: isCurrent ? Colors.black : Colors.white,
-//                     fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
-//                   ),
-//                 ),
-//               ),
-//             );
-//           }),
-
-//           // Next button
-//           IconButton(
-//             onPressed: currentPage < totalPages ? () => _fetchPage(context, currentPage + 1) : null,
-//             icon: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
-//             color: Colors.white,
-//             disabledColor: Colors.white24,
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-
-//   void _fetchPage(BuildContext context, int page) {
-//     switch (params.type) {
-//       case GridMoviesType.trending:
-//         context.read<TrendingMoviesBloc>().add(
-//           TrendingMoviesEvent.getTrending(lang: 'en-US', page: page, timeWindow: TimeWindow.week),
-//         );
-//         break;
-//       case GridMoviesType.topRated:
-//         context.read<TopRatedMoviesBloc>().add(
-//           TopRatedMoviesEvent.getTopRatedMovies(lang: 'en-US', page: page),
-//         );
-//         break;
-//       case GridMoviesType.similar:
-//         if (params.movieId != null) {
-//           context.read<SimilarMoviesBloc>().add(
-//             SimilarMoviesEvent.getSimilarMovies(id: params.movieId!, lang: 'en-US', page: page),
-//           );
-//         }
-//         break;
-//       case GridMoviesType.recommendation:
-//         if (params.movieId != null) {
-//           context.read<MovieRecommendationsBloc>().add(
-//             MovieRecommendationsEvent.getMoviesRecommendations(id: params.movieId!, lang: 'en-US', page: page),
-//           );
-//         }
-//         break;
-//     }
-//   }
-// }
-
-// class _MovieGridCard extends StatelessWidget {
-//   final Movie movie;
-
-//   const _MovieGridCard({required this.movie});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final hasPoster = (movie.posterPath ?? '').isNotEmpty;
-//     return Material(
-//       color: Colors.transparent,
-//       child: InkWell(
-//         borderRadius: BorderRadius.circular(16),
-//         onTap: () => context.pushNamed(RouteName.movieDetailsScreen, extra: movie),
-//         splashColor: Colors.white.withValues(alpha: 0.08),
-//         highlightColor: Colors.white.withValues(alpha: 0.04),
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             Expanded(
-//               child: Container(
-//                 decoration: BoxDecoration(
-//                   borderRadius: BorderRadius.circular(16),
-//                   boxShadow: [
-//                     BoxShadow(
-//                       color: Colors.black.withValues(alpha: 0.3),
-//                       blurRadius: 8,
-//                       offset: const Offset(0, 4),
-//                     ),
-//                   ],
-//                 ),
-//                 child: ClipRRect(
-//                   borderRadius: BorderRadius.circular(16),
-//                   child: Stack(
-//                     fit: StackFit.expand,
-//                     children: [
-//                       hasPoster
-//                           ? AppImage(
-//                               path: movie.posterPath!,
-//                               size: 'w342',
-//                               fit: BoxFit.cover,
-//                             )
-//                           : Container(color: const Color(0xFF1C1C1E)),
-//                       if (movie.voteAverage != null && movie.voteAverage! > 0)
-//                         Positioned(
-//                           top: 8,
-//                           left: 8,
-//                           child: _ratingChip(rating: movie.voteAverage!),
-//                         ),
-//                     ],
-//                   ),
-//                 ),
-//               ),
-//             ),
-//             const SizedBox(height: 8),
-//             Text(
-//               movie.title,
-//               maxLines: 2,
-//               overflow: TextOverflow.ellipsis,
-//               style: const TextStyle(
-//                 color: Colors.white,
-//                 fontSize: 13,
-//                 fontWeight: FontWeight.w500,
-//                 height: 1.25,
-//                 letterSpacing: -0.1,
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-
-//   Widget _ratingChip({required double rating}) {
-//     return Container(
-//       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-//       decoration: BoxDecoration(
-//         color: Colors.black.withValues(alpha: 0.55),
-//         borderRadius: BorderRadius.circular(6),
-//       ),
-//       child: Row(
-//         mainAxisSize: MainAxisSize.min,
-//         children: [
-//           const Icon(Icons.star_rounded, color: Color(0xFFFFD60A), size: 11),
-//           const SizedBox(width: 3),
-//           Text(
-//             rating.toStringAsFixed(1),
-//             style: const TextStyle(
-//               color: Colors.white,
-//               fontSize: 10,
-//               fontWeight: FontWeight.w600,
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
-
-//###########################################################
-import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -375,12 +25,12 @@ const Color _kBackground = Color(0xFF141416);
 const Color _kShimmerFill = Color(0xFF2C2C2E);
 const Color _kShimmerBase = Color(0xFF232325);
 const Color _kShimmerHighlight = Color(0xFF3A3A3D);
-const Color _kAccentRed = Color(0xFFFF453A); // Apple system red
+const Color _kAccentRed = Color(0xFFFF453A);
 
 class GridMoviesParams {
   final GridMoviesType type;
   final String title;
-  final int? movieId; // required for similar/recommendation
+  final int? movieId;
 
   const GridMoviesParams({
     required this.type,
@@ -397,14 +47,13 @@ class GridMoviesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double statusBarHeight = MediaQuery.of(context).padding.top;
-    const double expandedBarHeight = 110.0;
+    const double expandedBarHeight = 96.0;
 
     return Scaffold(
       backgroundColor: _kBackground,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
-          // ── CUSTOM COLLAPSIBLE SLIVER APP BAR ─────────────────────────────
           SliverAppBar(
             backgroundColor: _kBackground,
             surfaceTintColor: Colors.transparent,
@@ -423,94 +72,106 @@ class GridMoviesScreen extends StatelessWidget {
                 final double expandRatio =
                     ((top - minHeight) / (expandedBarHeight - kToolbarHeight))
                         .clamp(0.0, 1.0);
-                final double collapseRatio = 1.0 - expandRatio;
+                final double collapseRatio = (1.0 - expandRatio).clamp(
+                  0.0,
+                  1.0,
+                );
+
+                final double smallTitleOpacity =
+                    (collapseRatio > 0.7 ? (collapseRatio - 0.7) / 0.3 : 0.0)
+                        .clamp(0.0, 1.0);
 
                 return Stack(
                   children: [
-                    // 1. STATIC BACK BUTTON (Always visible & interactive)
+                    //  BIG TITLE
                     Positioned(
-                      left: 8,
-                      top: statusBarHeight,
-                      height: kToolbarHeight,
-                      child: GestureDetector(
-                        onTap: () {
-                          if (context.canPop()) {
-                            context.pop();
-                          } else {
-                            Navigator.of(context).maybePop();
-                          }
-                        },
-                        behavior: HitTestBehavior.opaque,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.arrow_back_ios_new,
-                              color: _kAccentRed,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 4),
-                            Opacity(
-                              opacity: expandRatio,
-                              child: const Text(
-                                'Home',
-                                style: TextStyle(
-                                  color: _kAccentRed,
-                                  fontSize: 17,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    // 2. SMALL TITLE (Centered/Left in Toolbar - Fades in on collapse)
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      top: statusBarHeight,
-                      height: kToolbarHeight,
-                      child: Container(
-                        alignment: Alignment.centerLeft,
-                        margin: const EdgeInsets.only(left: 48, right: 16),
-                        child: Opacity(
-                          // Starts fading in after 80% of scroll completion
-                          opacity: collapseRatio > 0.8
-                              ? (collapseRatio - 0.8) / 0.2
-                              : 0.0,
-                          child: Text(
-                            params.title,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              letterSpacing: -0.3,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    // 3. BIG TITLE (Bottom Left - Fades out on collapse)
-                    Positioned(
-                      left: 20,
-                      bottom: 12,
-                      right: 20,
+                      left: 16,
+                      bottom: 8,
+                      right: 16,
                       child: Opacity(
-                        opacity: expandRatio,
+                        opacity: expandRatio.clamp(0.0, 1.0),
                         child: Text(
                           params.title,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                             fontFamily: 'serif',
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 23,
+                            fontWeight: FontWeight.w600,
                             color: Colors.white,
-                            letterSpacing: -1.0,
+                            letterSpacing: -0.8,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    //  SMALL TITLE
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      top: statusBarHeight,
+                      height: kToolbarHeight,
+                      child: IgnorePointer(
+                        child: Container(
+                          alignment: Alignment.centerLeft,
+                          margin: const EdgeInsets.only(left: 45, right: 16),
+                          child: Opacity(
+                            opacity: smallTitleOpacity,
+                            child: Text(
+                              params.title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                                letterSpacing: -0.3,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    // STATIC BACK BUTTON
+                    Positioned(
+                      left: 8,
+                      top: statusBarHeight + (kToolbarHeight - 36) / 2,
+                      height: 36,
+                      child: GestureDetector(
+                        onTap: () {
+                          if (Navigator.of(context).canPop()) {
+                            Navigator.of(context).pop();
+                          } else if (context.canPop()) {
+                            context.pop();
+                          } else {
+                            context.go(RoutePath.bottomNavbar);
+                          }
+                        },
+                        behavior: HitTestBehavior.opaque,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.arrow_back_ios_new,
+                                color: _kAccentRed,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 4),
+                              Opacity(
+                                opacity: expandRatio.clamp(0.0, 1.0),
+                                child: const Text(
+                                  'Back',
+                                  style: TextStyle(
+                                    color: _kAccentRed,
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -521,14 +182,14 @@ class GridMoviesScreen extends StatelessWidget {
             ),
           ),
 
-          // ── BODY CONTENT ──────────────────────────────────────────────────
+          // BODY CONTENT
           _buildBody(),
         ],
       ),
     );
   }
 
-  // ── Body Logic (Handles BLoC states & Slivers) ─────────────────────────
+  //  Body
 
   Widget _buildBody() {
     switch (params.type) {
@@ -537,10 +198,7 @@ class GridMoviesScreen extends StatelessWidget {
           builder: (context, state) {
             return state.when(
               initial: () => const SliverToBoxAdapter(child: SizedBox.shrink()),
-              loading: () => const SliverFillRemaining(
-                hasScrollBody: false,
-                child: _GridShimmerLoading(),
-              ),
+              loading: () => _buildLoadingGrid(),
               error: (err) => SliverFillRemaining(
                 hasScrollBody: false,
                 child: _GridErrorView(message: err),
@@ -554,10 +212,7 @@ class GridMoviesScreen extends StatelessWidget {
           builder: (context, state) {
             return state.when(
               initial: () => const SliverToBoxAdapter(child: SizedBox.shrink()),
-              loading: () => const SliverFillRemaining(
-                hasScrollBody: false,
-                child: _GridShimmerLoading(),
-              ),
+              loading: () => _buildLoadingGrid(),
               error: (err) => SliverFillRemaining(
                 hasScrollBody: false,
                 child: _GridErrorView(message: err),
@@ -571,10 +226,7 @@ class GridMoviesScreen extends StatelessWidget {
           builder: (context, state) {
             return state.when(
               initial: () => const SliverToBoxAdapter(child: SizedBox.shrink()),
-              loading: () => const SliverFillRemaining(
-                hasScrollBody: false,
-                child: _GridShimmerLoading(),
-              ),
+              loading: () => _buildLoadingGrid(),
               error: (err) => SliverFillRemaining(
                 hasScrollBody: false,
                 child: _GridErrorView(message: err),
@@ -588,10 +240,7 @@ class GridMoviesScreen extends StatelessWidget {
           builder: (context, state) {
             return state.when(
               initial: () => const SliverToBoxAdapter(child: SizedBox.shrink()),
-              loading: () => const SliverFillRemaining(
-                hasScrollBody: false,
-                child: _GridShimmerLoading(),
-              ),
+              loading: () => _buildLoadingGrid(),
               error: (err) => SliverFillRemaining(
                 hasScrollBody: false,
                 child: _GridErrorView(message: err),
@@ -603,7 +252,28 @@ class GridMoviesScreen extends StatelessWidget {
     }
   }
 
-  Widget _buildContentSlivers(BuildContext context, PagedResullt<Movie> result) {
+  Widget _buildLoadingGrid() {
+    return SliverPadding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+      sliver: SliverGrid(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 0.6,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+        ),
+        delegate: SliverChildBuilderDelegate(
+          (context, index) => const _GridShimmerItem(),
+          childCount: 6,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildContentSlivers(
+    BuildContext context,
+    PagedResullt<Movie> result,
+  ) {
     if (result.results.isEmpty) {
       return const SliverFillRemaining(
         hasScrollBody: false,
@@ -614,7 +284,7 @@ class GridMoviesScreen extends StatelessWidget {
     return SliverMainAxisGroup(
       slivers: [
         SliverPadding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
           sliver: SliverGrid(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
@@ -622,13 +292,10 @@ class GridMoviesScreen extends StatelessWidget {
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
             ),
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                final movie = result.results[index];
-                return _MovieGridCard(movie: movie);
-              },
-              childCount: result.results.length,
-            ),
+            delegate: SliverChildBuilderDelegate((context, index) {
+              final movie = result.results[index];
+              return _MovieGridCard(movie: movie);
+            }, childCount: result.results.length),
           ),
         ),
         SliverToBoxAdapter(child: _buildPagination(context, result)),
@@ -710,45 +377,45 @@ class GridMoviesScreen extends StatelessWidget {
     switch (params.type) {
       case GridMoviesType.trending:
         context.read<TrendingMoviesBloc>().add(
-              TrendingMoviesEvent.getTrending(
-                lang: 'en-US',
-                page: page,
-                timeWindow: TimeWindow.week,
-              ),
-            );
+          TrendingMoviesEvent.getTrending(
+            lang: 'en-US',
+            page: page,
+            timeWindow: TimeWindow.week,
+          ),
+        );
         break;
       case GridMoviesType.topRated:
         context.read<TopRatedMoviesBloc>().add(
-              TopRatedMoviesEvent.getTopRatedMovies(lang: 'en-US', page: page),
-            );
+          TopRatedMoviesEvent.getTopRatedMovies(lang: 'en-US', page: page),
+        );
         break;
       case GridMoviesType.similar:
         if (params.movieId != null) {
           context.read<SimilarMoviesBloc>().add(
-                SimilarMoviesEvent.getSimilarMovies(
-                  id: params.movieId!,
-                  lang: 'en-US',
-                  page: page,
-                ),
-              );
+            SimilarMoviesEvent.getSimilarMovies(
+              id: params.movieId!,
+              lang: 'en-US',
+              page: page,
+            ),
+          );
         }
         break;
       case GridMoviesType.recommendation:
         if (params.movieId != null) {
           context.read<MovieRecommendationsBloc>().add(
-                MovieRecommendationsEvent.getMoviesRecommendations(
-                  id: params.movieId!,
-                  lang: 'en-US',
-                  page: page,
-                ),
-              );
+            MovieRecommendationsEvent.getMoviesRecommendations(
+              id: params.movieId!,
+              lang: 'en-US',
+              page: page,
+            ),
+          );
         }
         break;
     }
   }
 }
 
-// ── Movie Card Item ─────────────────────────────────────────────────────
+// Movie Card
 
 class _MovieGridCard extends StatelessWidget {
   final Movie movie;
@@ -762,7 +429,8 @@ class _MovieGridCard extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
-        onTap: () => context.pushNamed(RouteName.movieDetailsScreen, extra: movie),
+        onTap: () =>
+            context.pushNamed(RouteName.movieDetailsScreen, extra: movie),
         splashColor: Colors.white.withValues(alpha: 0.08),
         highlightColor: Colors.white.withValues(alpha: 0.04),
         child: Column(
@@ -848,7 +516,7 @@ class _MovieGridCard extends StatelessWidget {
   }
 }
 
-// ── Pagination Chip Widget ────────────────────────────────────────────────
+//  Pagination Chip Widget
 
 class _PageChip extends StatelessWidget {
   final String label;
@@ -895,52 +563,47 @@ class _PageChip extends StatelessWidget {
   }
 }
 
-// ── Shimmer & Empty States ────────────────────────────────────────────────
+//  Shimmer & Error & Empty States
 
-class _GridShimmerLoading extends StatelessWidget {
-  const _GridShimmerLoading();
+class _GridShimmerItem extends StatelessWidget {
+  const _GridShimmerItem();
 
   @override
   Widget build(BuildContext context) {
     return _Shimmer(
-      child: GridView.builder(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 0.6,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-        ),
-        itemCount: 6,
-        itemBuilder: (context, index) => Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(child: _shimmerBox(borderRadius: 16)),
-            const SizedBox(height: 8),
-            _shimmerBox(height: 12, borderRadius: 4),
-            const SizedBox(height: 6),
-            _shimmerBox(width: 80, height: 12, borderRadius: 4),
-          ],
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                color: _kShimmerFill,
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            height: 12,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: _kShimmerFill,
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Container(
+            height: 12,
+            width: 80,
+            decoration: BoxDecoration(
+              color: _kShimmerFill,
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+        ],
       ),
     );
   }
-}
-
-Widget _shimmerBox({
-  double? width,
-  double? height,
-  required double borderRadius,
-}) {
-  return Container(
-    width: width,
-    height: height,
-    decoration: BoxDecoration(
-      color: _kShimmerFill,
-      borderRadius: BorderRadius.circular(borderRadius),
-    ),
-  );
 }
 
 class _Shimmer extends StatefulWidget {
@@ -960,7 +623,7 @@ class _ShimmerState extends State<_Shimmer>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1400),
+      duration: const Duration(milliseconds: 1200),
     )..repeat();
   }
 
@@ -979,7 +642,7 @@ class _ShimmerState extends State<_Shimmer>
           blendMode: BlendMode.srcATop,
           shaderCallback: (bounds) => LinearGradient(
             colors: const [_kShimmerBase, _kShimmerHighlight, _kShimmerBase],
-            stops: const [0.35, 0.5, 0.65],
+            stops: const [0.2, 0.5, 0.8],
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
             transform: _SlidingGradientTransform(_controller.value),

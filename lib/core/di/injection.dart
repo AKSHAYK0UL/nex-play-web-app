@@ -168,7 +168,7 @@ Future<void> initDependencies() async {
   );
 
   //trending movies bloc
-  sl.registerLazySingleton<TrendingMoviesBloc>(
+  sl.registerFactory<TrendingMoviesBloc>(
     () => TrendingMoviesBloc(trendingUsecase: sl<TrendingUsecase>()),
   );
 
@@ -191,7 +191,7 @@ Future<void> initDependencies() async {
 
   //top rated movies
 
-  sl.registerLazySingleton<TopRatedMoviesBloc>(
+  sl.registerFactory<TopRatedMoviesBloc>(
     () => TopRatedMoviesBloc(topratedUsecase: sl<TopratedUsecase>()),
   );
 }

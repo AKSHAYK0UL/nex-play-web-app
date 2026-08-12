@@ -24,7 +24,7 @@ class BuildTopRatedMoviesList extends StatelessWidget {
             final list = movies.results.take(10).toList();
             if (list.isEmpty) return const SizedBox.shrink();
             return HorzontialMovieListContent(
-              title: "Top Rated Movies",
+              title: "Top Rated",
               movies: list,
               hPadding: 15,
               vPadding: 0,
@@ -33,7 +33,7 @@ class BuildTopRatedMoviesList extends StatelessWidget {
                   RouteName.gridMoviesScreen,
                   extra: const GridMoviesParams(
                     type: GridMoviesType.topRated,
-                    title: "Top Rated Movies",
+                    title: "Top Rated",
                   ),
                 );
               },

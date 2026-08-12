@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -167,25 +166,48 @@ Future<void> initAppRouter() async {
             case GridMoviesType.trending:
               return BlocProvider(
                 create: (_) => sl<TrendingMoviesBloc>()
-                  ..add(const TrendingMoviesEvent.getTrending(lang: 'en-US', page: 1, timeWindow: TimeWindow.week)),
+                  ..add(
+                    const TrendingMoviesEvent.getTrending(
+                      lang: 'en-US',
+                      page: 1,
+                      timeWindow: TimeWindow.week,
+                    ),
+                  ),
                 child: GridMoviesScreen(params: params),
               );
             case GridMoviesType.topRated:
               return BlocProvider(
                 create: (_) => sl<TopRatedMoviesBloc>()
-                  ..add(const TopRatedMoviesEvent.getTopRatedMovies(lang: 'en-US', page: 1)),
+                  ..add(
+                    const TopRatedMoviesEvent.getTopRatedMovies(
+                      lang: 'en-US',
+                      page: 1,
+                    ),
+                  ),
                 child: GridMoviesScreen(params: params),
               );
             case GridMoviesType.similar:
               return BlocProvider(
                 create: (_) => sl<SimilarMoviesBloc>()
-                  ..add(SimilarMoviesEvent.getSimilarMovies(id: params.movieId!, lang: 'en-US', page: 1)),
+                  ..add(
+                    SimilarMoviesEvent.getSimilarMovies(
+                      id: params.movieId!,
+                      lang: 'en-US',
+                      page: 1,
+                    ),
+                  ),
                 child: GridMoviesScreen(params: params),
               );
             case GridMoviesType.recommendation:
               return BlocProvider(
                 create: (_) => sl<MovieRecommendationsBloc>()
-                  ..add(MovieRecommendationsEvent.getMoviesRecommendations(id: params.movieId!, lang: 'en-US', page: 1)),
+                  ..add(
+                    MovieRecommendationsEvent.getMoviesRecommendations(
+                      id: params.movieId!,
+                      lang: 'en-US',
+                      page: 1,
+                    ),
+                  ),
                 child: GridMoviesScreen(params: params),
               );
           }
