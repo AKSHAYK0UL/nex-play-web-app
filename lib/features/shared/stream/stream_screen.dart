@@ -1,15 +1,15 @@
-
-
-//##########################################################################
 import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nex_play/core/config/secrets.dart';
+
+import 'web_stream_guard_stub.dart'
+    if (dart.library.html) 'web_stream_guard_web.dart'
+    as web_guard;
 
 class StreamScreen extends StatefulWidget {
   final String streamUrl;
@@ -23,7 +23,7 @@ class StreamScreen extends StatefulWidget {
 class _StreamScreenState extends State<StreamScreen> {
   InAppWebViewController? _controller;
 
-  // Key to force-rebuild the Web Iframe on demand or recovery
+  // Key to force rebuild the Web Iframe on demand or recovery
   Key _webPlayerKey = UniqueKey();
 
   // Error handling state
@@ -43,6 +43,10 @@ class _StreamScreenState extends State<StreamScreen> {
   int _webAdClickCount = 0;
   static const int _requiredShieldClicks = 3;
 
+  // Web platform view bookkeeping (see web_stream_guard_web.dart)
+  String? _registeredWebViewType;
+  final Set<String> _allWebViewTypes = {};
+
   // Mobile WebView Settings
   final _webViewSettings = InAppWebViewSettings(
     javaScriptEnabled: true,
@@ -52,7 +56,7 @@ class _StreamScreenState extends State<StreamScreen> {
     useShouldOverrideUrlLoading: true,
     disableContextMenu: true,
     supportMultipleWindows: false,
-    javaScriptCanOpenWindowsAutomatically: false, // Strictly block popups
+    javaScriptCanOpenWindowsAutomatically: false, // block popups
   );
 
   @override
@@ -69,6 +73,11 @@ class _StreamScreenState extends State<StreamScreen> {
   void dispose() {
     _hideTimer?.cancel();
     _stateWatchdog?.cancel();
+    if (kIsWeb) {
+      for (final viewType in _allWebViewTypes) {
+        web_guard.disposeGuardedIframe(viewType);
+      }
+    }
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     super.dispose();
@@ -109,7 +118,7 @@ class _StreamScreenState extends State<StreamScreen> {
       _hasError = false;
       _errorMessage = '';
       _webAdClickCount = 0;
-      _webPlayerKey = UniqueKey(); // Re-instantiates iframe cleanly
+      _webPlayerKey = UniqueKey(); // Reinstantiates iframe cleanly
     });
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
@@ -121,10 +130,26 @@ class _StreamScreenState extends State<StreamScreen> {
     );
   }
 
+  String get _webViewType =>
+      'nexplay-stream-iframe-${identityHashCode(_webPlayerKey)}';
+
+  void _onWebRedirectBlocked(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 2),
+        backgroundColor: Colors.deepOrange,
+      ),
+    );
+  }
+
   String get _allowedHostsJs =>
       '[${kAllowedHosts.map((h) => "'$h'").join(', ')}]';
 
-  String get _injectScript => """
+  String get _injectScript =>
+      """
   (function() {
     if (window.__vsInjected) return;
     window.__vsInjected = true;
@@ -269,68 +294,24 @@ class _StreamScreenState extends State<StreamScreen> {
   """;
 
   Widget _buildWebPlayer() {
+    final viewType = _webViewType;
+
+    if (_registeredWebViewType != viewType) {
+      web_guard.registerGuardedIframe(
+        viewType: viewType,
+        url: widget.streamUrl,
+        onRedirectBlocked: _onWebRedirectBlocked,
+      );
+      _registeredWebViewType = viewType;
+      _allWebViewTypes.add(viewType);
+    }
+
     return Stack(
       key: _webPlayerKey,
       children: [
-        Positioned.fill(
-          child: HtmlWidget(
-            '''
-            <style>
-              html, body {
-                margin: 0 !important;
-                padding: 0 !important;
-                width: 100% !important;
-                height: 100% !important;
-                overflow: hidden !important;
-                background: #000 !important;
-              }
-              iframe {
-                position: fixed !important;
-                top: 0 !important;
-                left: 0 !important;
-                width: 100vw !important;
-                height: 100vh !important;
-                border: none !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                display: block !important;
-              }
-            </style>
-            
-            <iframe
-              src="${widget.streamUrl}"
-              scrolling="no"
-              allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-              sandbox="allow-scripts allow-forms allow-presentation allow-encrypted-media"
-              referrerpolicy="no-referrer"
-              allowfullscreen="true">
-            </iframe>
-            ''',
-            customStylesBuilder: (element) {
-              if (element.localName == 'iframe') {
-                return {
-                  'position': 'fixed',
-                  'top': '0',
-                  'left': '0',
-                  'width': '100vw',
-                  'height': '100vh',
-                  'border': 'none',
-                  'margin': '0',
-                  'padding': '0',
-                  'display': 'block',
-                };
-              }
-              return {
-                'margin': '0',
-                'padding': '0',
-                'width': '100%',
-                'height': '100%',
-              };
-            },
-          ),
-        ),
+        Positioned.fill(child: HtmlElementView(viewType: viewType)),
 
-        // WEB AD SHIELD OVERLAY (Absorbs ad trigger taps)
+        // WEB AD SHIELD OVERLAY (Absorbs the first few trigger taps)
         if (_webAdClickCount < _requiredShieldClicks)
           Positioned.fill(
             child: Listener(
@@ -354,8 +335,6 @@ class _StreamScreenState extends State<StreamScreen> {
               child: Container(color: Colors.transparent),
             ),
           ),
-
-      
       ],
     );
   }
@@ -402,13 +381,17 @@ class _StreamScreenState extends State<StreamScreen> {
 
         if (url == null) return NavigationActionPolicy.CANCEL;
 
-        // Block non-HTTP schemas (e.g., intent://, market://, whatsapp://)
+        // Block nonHTTP schemas (e.g., intent://, market://, whatsapp://)
         if (!url.startsWith('http://') && !url.startsWith('https://')) {
           return NavigationActionPolicy.CANCEL;
         }
 
         // Malicious domains blacklist
-        final blockedKeywords = ['playin04.com', 'gohappyin.com', 'redtrackApi'];
+        final blockedKeywords = [
+          'playin04.com',
+          'gohappyin.com',
+          'redtrackApi',
+        ];
         if (blockedKeywords.any((keyword) => url.contains(keyword))) {
           return NavigationActionPolicy.CANCEL;
         }
@@ -488,8 +471,9 @@ class _StreamScreenState extends State<StreamScreen> {
               child: IgnorePointer(
                 ignoring: !_hasError && !kIsWeb && !_isControlVisible,
                 child: AnimatedOpacity(
-                  opacity:
-                      (_hasError || kIsWeb || _isControlVisible) ? 1.0 : 0.0,
+                  opacity: (_hasError || kIsWeb || _isControlVisible)
+                      ? 1.0
+                      : 0.0,
                   duration: const Duration(milliseconds: 300),
                   child: Visibility(
                     visible: !kIsWeb,

@@ -5,6 +5,7 @@ import 'package:nex_play/core/enums/grid_movie_type.dart';
 import 'package:nex_play/core/enums/time_window.dart';
 import 'package:nex_play/core/paged_result/paged_resullt.dart';
 import 'package:nex_play/core/router/app_router.dart';
+import 'package:nex_play/core/di/injection.dart';
 import 'package:nex_play/core/widgets/image.dart';
 import 'package:nex_play/features/shared/movie/domain/entities/movie.dart';
 import 'package:nex_play/features/shared/movie/presentation/bloc/movies_recommendations_bloc/movies_recommendations_bloc.dart';
@@ -39,10 +40,76 @@ class GridMoviesParams {
   });
 }
 
-class GridMoviesScreen extends StatelessWidget {
+class GridMoviesScreen extends StatefulWidget {
   final GridMoviesParams params;
 
   const GridMoviesScreen({super.key, required this.params});
+
+  @override
+  State<GridMoviesScreen> createState() => _GridMoviesScreenState();
+}
+
+class _GridMoviesScreenState extends State<GridMoviesScreen> {
+  TrendingMoviesBloc? _trendingBloc;
+  TopRatedMoviesBloc? _topRatedBloc;
+  SimilarMoviesBloc? _similarBloc;
+  MovieRecommendationsBloc? _recommendationsBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    switch (widget.params.type) {
+      case GridMoviesType.trending:
+        _trendingBloc = sl<TrendingMoviesBloc>()
+          ..add(
+            const TrendingMoviesEvent.getTrending(
+              lang: 'en-US',
+              page: 1,
+              timeWindow: TimeWindow.week,
+            ),
+          );
+        break;
+      case GridMoviesType.topRated:
+        _topRatedBloc = sl<TopRatedMoviesBloc>()
+          ..add(
+            const TopRatedMoviesEvent.getTopRatedMovies(lang: 'en-US', page: 1),
+          );
+        break;
+      case GridMoviesType.similar:
+        if (widget.params.movieId != null) {
+          _similarBloc = sl<SimilarMoviesBloc>()
+            ..add(
+              SimilarMoviesEvent.getSimilarMovies(
+                id: widget.params.movieId!,
+                lang: 'en-US',
+                page: 1,
+              ),
+            );
+        }
+        break;
+      case GridMoviesType.recommendation:
+        if (widget.params.movieId != null) {
+          _recommendationsBloc = sl<MovieRecommendationsBloc>()
+            ..add(
+              MovieRecommendationsEvent.getMoviesRecommendations(
+                id: widget.params.movieId!,
+                lang: 'en-US',
+                page: 1,
+              ),
+            );
+        }
+        break;
+    }
+  }
+
+  @override
+  void dispose() {
+    _trendingBloc?.close();
+    _topRatedBloc?.close();
+    _similarBloc?.close();
+    _recommendationsBloc?.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +158,7 @@ class GridMoviesScreen extends StatelessWidget {
                       child: Opacity(
                         opacity: expandRatio.clamp(0.0, 1.0),
                         child: Text(
-                          params.title,
+                          widget.params.title,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
@@ -118,7 +185,7 @@ class GridMoviesScreen extends StatelessWidget {
                           child: Opacity(
                             opacity: smallTitleOpacity,
                             child: Text(
-                              params.title,
+                              widget.params.title,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
@@ -192,9 +259,10 @@ class GridMoviesScreen extends StatelessWidget {
   //  Body
 
   Widget _buildBody() {
-    switch (params.type) {
+    switch (widget.params.type) {
       case GridMoviesType.trending:
         return BlocBuilder<TrendingMoviesBloc, TrendingMoviesState>(
+          bloc: _trendingBloc,
           builder: (context, state) {
             return state.when(
               initial: () => const SliverToBoxAdapter(child: SizedBox.shrink()),
@@ -209,6 +277,7 @@ class GridMoviesScreen extends StatelessWidget {
         );
       case GridMoviesType.topRated:
         return BlocBuilder<TopRatedMoviesBloc, TopRatedMoviesState>(
+          bloc: _topRatedBloc,
           builder: (context, state) {
             return state.when(
               initial: () => const SliverToBoxAdapter(child: SizedBox.shrink()),
@@ -223,6 +292,7 @@ class GridMoviesScreen extends StatelessWidget {
         );
       case GridMoviesType.similar:
         return BlocBuilder<SimilarMoviesBloc, SimilarMoviesState>(
+          bloc: _similarBloc,
           builder: (context, state) {
             return state.when(
               initial: () => const SliverToBoxAdapter(child: SizedBox.shrink()),
@@ -237,6 +307,7 @@ class GridMoviesScreen extends StatelessWidget {
         );
       case GridMoviesType.recommendation:
         return BlocBuilder<MovieRecommendationsBloc, MovieRecommendationsState>(
+          bloc: _recommendationsBloc,
           builder: (context, state) {
             return state.when(
               initial: () => const SliverToBoxAdapter(child: SizedBox.shrink()),
@@ -374,9 +445,9 @@ class GridMoviesScreen extends StatelessWidget {
   }
 
   void _fetchPage(BuildContext context, int page) {
-    switch (params.type) {
+    switch (widget.params.type) {
       case GridMoviesType.trending:
-        context.read<TrendingMoviesBloc>().add(
+        _trendingBloc?.add(
           TrendingMoviesEvent.getTrending(
             lang: 'en-US',
             page: page,
@@ -385,15 +456,15 @@ class GridMoviesScreen extends StatelessWidget {
         );
         break;
       case GridMoviesType.topRated:
-        context.read<TopRatedMoviesBloc>().add(
+        _topRatedBloc?.add(
           TopRatedMoviesEvent.getTopRatedMovies(lang: 'en-US', page: page),
         );
         break;
       case GridMoviesType.similar:
-        if (params.movieId != null) {
-          context.read<SimilarMoviesBloc>().add(
+        if (widget.params.movieId != null) {
+          _similarBloc?.add(
             SimilarMoviesEvent.getSimilarMovies(
-              id: params.movieId!,
+              id: widget.params.movieId!,
               lang: 'en-US',
               page: page,
             ),
@@ -401,10 +472,10 @@ class GridMoviesScreen extends StatelessWidget {
         }
         break;
       case GridMoviesType.recommendation:
-        if (params.movieId != null) {
-          context.read<MovieRecommendationsBloc>().add(
+        if (widget.params.movieId != null) {
+          _recommendationsBloc?.add(
             MovieRecommendationsEvent.getMoviesRecommendations(
-              id: params.movieId!,
+              id: widget.params.movieId!,
               lang: 'en-US',
               page: page,
             ),
