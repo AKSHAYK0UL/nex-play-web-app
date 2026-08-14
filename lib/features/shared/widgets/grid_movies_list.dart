@@ -22,7 +22,7 @@ import 'package:nex_play/features/shared/movie/presentation/bloc/trending_movies
 import 'package:nex_play/features/shared/movie/presentation/bloc/trending_movies_bloc/bloc/trending_movies_state.dart';
 
 // Shared palette
-const Color _kBackground = Color(0xFF141416);
+const Color _kBackground =  Colors.black;
 const Color _kShimmerFill = Color(0xFF2C2C2E);
 const Color _kShimmerBase = Color(0xFF232325);
 const Color _kShimmerHighlight = Color(0xFF3A3A3D);
@@ -118,140 +118,143 @@ class _GridMoviesScreenState extends State<GridMoviesScreen> {
 
     return Scaffold(
       backgroundColor: _kBackground,
-      body: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
-        slivers: [
-          SliverAppBar(
-            backgroundColor: _kBackground,
-            surfaceTintColor: Colors.transparent,
-            elevation: 0,
-            pinned: true,
-            stretch: true,
-            expandedHeight: expandedBarHeight,
-            automaticallyImplyLeading: false,
-            flexibleSpace: LayoutBuilder(
-              builder: (context, constraints) {
-                final double top = constraints.biggest.height;
-                final double minHeight = kToolbarHeight + statusBarHeight;
-
-                // Calculate ratios for animations:
-                // 1.0 = fully expanded, 0.0 = fully collapsed
-                final double expandRatio =
-                    ((top - minHeight) / (expandedBarHeight - kToolbarHeight))
-                        .clamp(0.0, 1.0);
-                final double collapseRatio = (1.0 - expandRatio).clamp(
-                  0.0,
-                  1.0,
-                );
-
-                final double smallTitleOpacity =
-                    (collapseRatio > 0.7 ? (collapseRatio - 0.7) / 0.3 : 0.0)
-                        .clamp(0.0, 1.0);
-
-                return Stack(
-                  children: [
-                    //  BIG TITLE
-                    Positioned(
-                      left: 16,
-                      bottom: 8,
-                      right: 16,
-                      child: Opacity(
-                        opacity: expandRatio.clamp(0.0, 1.0),
-                        child: Text(
-                          widget.params.title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontFamily: 'serif',
-                            fontSize: 23,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                            letterSpacing: -0.8,
+      body: SafeArea(
+        top: false,
+        child: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            SliverAppBar(
+              backgroundColor: _kBackground,
+              surfaceTintColor: Colors.transparent,
+              elevation: 0,
+              pinned: true,
+              stretch: true,
+              expandedHeight: expandedBarHeight,
+              automaticallyImplyLeading: false,
+              flexibleSpace: LayoutBuilder(
+                builder: (context, constraints) {
+                  final double top = constraints.biggest.height;
+                  final double minHeight = kToolbarHeight + statusBarHeight;
+        
+                  // Calculate ratios for animations:
+                  // 1.0 = fully expanded, 0.0 = fully collapsed
+                  final double expandRatio =
+                      ((top - minHeight) / (expandedBarHeight - kToolbarHeight))
+                          .clamp(0.0, 1.0);
+                  final double collapseRatio = (1.0 - expandRatio).clamp(
+                    0.0,
+                    1.0,
+                  );
+        
+                  final double smallTitleOpacity =
+                      (collapseRatio > 0.7 ? (collapseRatio - 0.7) / 0.3 : 0.0)
+                          .clamp(0.0, 1.0);
+        
+                  return Stack(
+                    children: [
+                      //  BIG TITLE
+                      Positioned(
+                        left: 16,
+                        bottom: 8,
+                        right: 16,
+                        child: Opacity(
+                          opacity: expandRatio.clamp(0.0, 1.0),
+                          child: Text(
+                            widget.params.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontFamily: 'serif',
+                              fontSize: 23,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                              letterSpacing: -0.8,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-
-                    //  SMALL TITLE
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      top: statusBarHeight,
-                      height: kToolbarHeight,
-                      child: IgnorePointer(
-                        child: Container(
-                          alignment: Alignment.centerLeft,
-                          margin: const EdgeInsets.only(left: 45, right: 16),
-                          child: Opacity(
-                            opacity: smallTitleOpacity,
-                            child: Text(
-                              widget.params.title,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                                letterSpacing: -0.3,
+        
+                      //  SMALL TITLE
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        top: statusBarHeight,
+                        height: kToolbarHeight,
+                        child: IgnorePointer(
+                          child: Container(
+                            alignment: Alignment.centerLeft,
+                            margin: const EdgeInsets.only(left: 45, right: 16),
+                            child: Opacity(
+                              opacity: smallTitleOpacity,
+                              child: Text(
+                                widget.params.title,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                  letterSpacing: -0.3,
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-
-                    // STATIC BACK BUTTON
-                    Positioned(
-                      left: 8,
-                      top: statusBarHeight + (kToolbarHeight - 36) / 2,
-                      height: 36,
-                      child: GestureDetector(
-                        onTap: () {
-                          if (Navigator.of(context).canPop()) {
-                            Navigator.of(context).pop();
-                          } else if (context.canPop()) {
-                            context.pop();
-                          } else {
-                            context.go(RoutePath.bottomNavbar);
-                          }
-                        },
-                        behavior: HitTestBehavior.opaque,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.arrow_back_ios_new,
-                                color: _kAccentRed,
-                                size: 20,
-                              ),
-                              const SizedBox(width: 4),
-                              Opacity(
-                                opacity: expandRatio.clamp(0.0, 1.0),
-                                child: const Text(
-                                  'Back',
-                                  style: TextStyle(
-                                    color: _kAccentRed,
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.w400,
+        
+                      // STATIC BACK BUTTON
+                      Positioned(
+                        left: 8,
+                        top: statusBarHeight + (kToolbarHeight - 36) / 2,
+                        height: 36,
+                        child: GestureDetector(
+                          onTap: () {
+                            if (Navigator.of(context).canPop()) {
+                              Navigator.of(context).pop();
+                            } else if (context.canPop()) {
+                              context.pop();
+                            } else {
+                              context.go(RoutePath.bottomNavbar);
+                            }
+                          },
+                          behavior: HitTestBehavior.opaque,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.arrow_back_ios_new,
+                                  color: _kAccentRed,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 4),
+                                Opacity(
+                                  opacity: expandRatio.clamp(0.0, 1.0),
+                                  child: const Text(
+                                    'Back',
+                                    style: TextStyle(
+                                      color: _kAccentRed,
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w400,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                );
-              },
+                    ],
+                  );
+                },
+              ),
             ),
-          ),
-
-          // BODY CONTENT
-          _buildBody(),
-        ],
+        
+            // BODY CONTENT
+            _buildBody(),
+          ],
+        ),
       ),
     );
   }

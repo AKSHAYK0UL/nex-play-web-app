@@ -78,81 +78,86 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
         return Scaffold(
                     // backgroundColor: Colors.white,
           backgroundColor: Colors.black,
-          body: CustomScrollView(
-            physics: const BouncingScrollPhysics(),
-            slivers: [
-              SliverAppBar(
-                pinned: true,
-                stretch: true,
-                backgroundColor: Colors.black,
-                expandedHeight: 340,
-                leadingWidth: 64,
-                leading: Padding(
-                  padding: const EdgeInsets.only(left: 16, top: 6),
-                  child: buildGlassActionButton(
-                    icon: Icons.arrow_back_ios_new_rounded,
-                    onTap: () => context.pop(),
+          body: SafeArea(
+            top: false,
+            bottom: false,
+            minimum: EdgeInsets.only(bottom: 10),
+            child: CustomScrollView(
+              physics: const BouncingScrollPhysics(),
+              slivers: [
+                SliverAppBar(
+                  pinned: true,
+                  stretch: true,
+                  backgroundColor: Colors.black,
+                  expandedHeight: 340,
+                  leadingWidth: 64,
+                  leading: Padding(
+                    padding: const EdgeInsets.only(left: 16, top: 6),
+                    child: buildGlassActionButton(
+                      icon: Icons.arrow_back_ios_new_rounded,
+                      onTap: () => context.pop(),
+                    ),
+                  ),
+                  flexibleSpace: FlexibleSpaceBar(
+                    stretchModes: const [StretchMode.zoomBackground],
+            
+                    background: buildBackdrop(movie: movie),
                   ),
                 ),
-                flexibleSpace: FlexibleSpaceBar(
-                  stretchModes: const [StretchMode.zoomBackground],
-
-                  background: buildBackdrop(movie: movie),
-                ),
-              ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      buildTitleRow(movie: movie),
-                      const SizedBox(height: 22),
-                      buildActionRow(
-                        context: context,
-                        accent: MovieDetailScreen.accent,
-                        movie: movie,
-                        isLoading: isLoadingDetails,
-                      ),
-                      const SizedBox(height: 26),
-                      if (errorMessage != null)
-                        DetailErrorSection(
-                          message: errorMessage,
-                          onRetry: _fetchDetails,
-                        )
-                      else if (isLoadingDetails)
-                        const DetailLoadingSection()
-                      else ...[
-                        if ((movie.overview ?? '').isNotEmpty) ...[
-                          Text(
-                            movie.overview!,
-                            style: const TextStyle(
-                              color: Colors.white70,
-                              fontSize: 15,
-                              height: 1.5,
-                              letterSpacing: 0.1,
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 40),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        buildTitleRow(movie: movie),
+                        const SizedBox(height: 22),
+                        buildActionRow(
+                          context: context,
+                          accent: MovieDetailScreen.accent,
+                          movie: movie,
+                          isLoading: isLoadingDetails,
+                        ),
+                        const SizedBox(height: 26),
+                        if (errorMessage != null)
+                          DetailErrorSection(
+                            message: errorMessage,
+                            onRetry: _fetchDetails,
+                          )
+                        else if (isLoadingDetails)
+                          const DetailLoadingSection()
+                        else ...[
+                          if ((movie.overview ?? '').isNotEmpty) ...[
+                            Text(
+                              movie.overview!,
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 15,
+                                height: 1.5,
+                                letterSpacing: 0.1,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 26),
-                        ],
-                        if ((movie.genres ?? []).isNotEmpty) ...[
-                          buildGenreChip(genres: movie.genres!),
+                            const SizedBox(height: 26),
+                          ],
+                          if ((movie.genres ?? []).isNotEmpty) ...[
+                            buildGenreChip(genres: movie.genres!),
+                            const SizedBox(height: 30),
+                          ],
+                          buildInfoGrid(context: context, movie: movie),
                           const SizedBox(height: 30),
+            
+                          //recommendation section
+                          RecommendationsSection(movieId: widget.movie.id),
+                          //similar section
+                          const SizedBox(height: 20),
+                          SimilarSection(movieId: widget.movie.id),
                         ],
-                        buildInfoGrid(context: context, movie: movie),
-                        const SizedBox(height: 30),
-
-                        //recommendation section
-                        RecommendationsSection(movieId: widget.movie.id),
-                        //similar section
-                        const SizedBox(height: 20),
-                        SimilarSection(movieId: widget.movie.id),
                       ],
-                    ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },
