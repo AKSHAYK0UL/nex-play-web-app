@@ -5,7 +5,6 @@ import 'genre.dart';
 import 'language.dart';
 import 'production.dart';
 
-
 class Movie extends Equatable {
   final int id;
   final String title;

@@ -1,8 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
+import 'package:nex_play/core/cache/cache_service_impl/movie_cache/movie_cache_key.dart';
+import 'package:nex_play/core/cache/cache_service_impl/movie_cache/movie_cache_service.dart';
+import 'package:nex_play/core/cache/cache_service_interface/cache_service_interface.dart';
 import 'package:nex_play/core/constants/hive_const.dart';
 import 'package:nex_play/core/network/dio_client.dart';
+import 'package:nex_play/core/paged_result/paged.dart';
 import 'package:nex_play/features/auth/data/local/auth_local_datasource.dart';
 import 'package:nex_play/features/auth/data/remote/auth_api_service.dart';
 import 'package:nex_play/features/auth/data/remote/auth_remote_datasource.dart';
@@ -16,6 +20,7 @@ import 'package:nex_play/features/auth/domain/usecases/signin_usecase.dart';
 import 'package:nex_play/features/auth/domain/usecases/signup_usecase.dart';
 import 'package:nex_play/features/auth/domain/usecases/verify_usecase.dart';
 import 'package:nex_play/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:nex_play/features/shared/movie/data/models/movie.dart';
 import 'package:nex_play/features/shared/movie/data/remote/movie_api_service.dart';
 import 'package:nex_play/features/shared/movie/data/remote/movie_remote_datasource.dart';
 import 'package:nex_play/features/shared/movie/data/repositories/movie_repository_impl.dart';
@@ -115,6 +120,12 @@ Future<void> initDependencies() async {
 
   //---------------------MOvie DI---------------------
 
+  //cache
+
+  sl.registerLazySingleton<CacheServiceInterface<MovieCacheKey, Paged<Movie>>>(
+    () => MovieCacheService<MovieCacheKey, Paged<Movie>>(),
+  );
+
   //Movie API service
   sl.registerLazySingleton<MovieApiService>(() => MovieApiService(sl<Dio>()));
 
@@ -125,7 +136,10 @@ Future<void> initDependencies() async {
 
   //Repository
   sl.registerLazySingleton<MovieRepository>(
-    () => MovieRepositoryImpl(sl<MovieRemoteDatasource>()),
+    () => MovieRepositoryImpl(
+      sl<MovieRemoteDatasource>(),
+      sl<CacheServiceInterface<MovieCacheKey, Paged<Movie>>>(),
+    ),
   );
 
   //usecases
